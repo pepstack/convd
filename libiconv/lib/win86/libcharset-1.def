@@ -1,0 +1,6 @@
+LIBRARY libcharset-1.dll
+EXPORTS
+_get_output_format      	@1
+libcharset_relocate     	@2
+libcharset_set_relocation_prefix	@3
+locale_charset          	@4

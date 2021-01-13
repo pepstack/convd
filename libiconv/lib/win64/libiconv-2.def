@@ -1,0 +1,16 @@
+LIBRARY libiconv-2.dll
+EXPORTS
+_imp___libiconv_version 	@1 DATA
+_libiconv_version       	@2 DATA
+aliases2_lookup         	@3
+aliases_lookup          	@4
+iconv_canonicalize      	@5
+libiconv                	@6
+libiconv_close          	@7
+libiconv_open           	@8
+libiconv_open_into      	@9
+libiconv_relocate       	@10
+libiconv_set_relocation_prefix	@11
+libiconvctl             	@12
+libiconvlist            	@13
+locale_charset          	@14

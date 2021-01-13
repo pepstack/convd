@@ -1,0 +1,79 @@
+LIBRARY libintl-8.dll
+EXPORTS
+__printf__              	@1
+_get_output_format      	@2
+_nl_expand_alias        	@3
+_nl_explode_name        	@4
+_nl_find_domain         	@5
+_nl_find_msg            	@6
+_nl_language_preferences_default	@7
+_nl_load_domain         	@8
+_nl_locale_name         	@9
+_nl_locale_name_default 	@10
+_nl_locale_name_posix   	@11
+_nl_log_untranslated    	@12
+_nl_make_l10nflist      	@13
+_nl_msg_cat_cntr        	@14 DATA
+_nl_normalize_codeset   	@15
+_nl_state_lock          	@16 DATA
+bind_textdomain_codeset 	@17
+bindtextdomain          	@18
+dcgettext               	@19
+dcngettext              	@20
+dgettext                	@21
+dngettext               	@22
+gettext                 	@23
+libintl_bind_textdomain_codeset	@24
+libintl_bindtextdomain  	@25
+libintl_dcgettext       	@26
+libintl_dcigettext      	@27
+libintl_dcngettext      	@28
+libintl_dgettext        	@29
+libintl_dngettext       	@30
+libintl_fprintf         	@31
+libintl_fwprintf        	@32
+libintl_gettext         	@33
+libintl_gettext_extract_plural	@34
+libintl_gettext_free_exp	@35
+libintl_gettext_germanic_plural	@36 DATA
+libintl_gettextparse    	@37
+libintl_hash_string     	@38
+libintl_lock_destroy    	@39
+libintl_lock_init       	@40
+libintl_lock_lock       	@41
+libintl_lock_unlock     	@42
+libintl_ngettext        	@43
+libintl_nl_current_default_domain	@44 DATA
+libintl_nl_default_default_domain	@45 DATA
+libintl_nl_default_dirname	@46 DATA
+libintl_nl_domain_bindings	@47 DATA
+libintl_once            	@48
+libintl_recursive_lock_destroy	@49
+libintl_recursive_lock_init	@50
+libintl_recursive_lock_lock	@51
+libintl_recursive_lock_unlock	@52
+libintl_relocate        	@53
+libintl_rwlock_destroy  	@54
+libintl_rwlock_init     	@55
+libintl_rwlock_rdlock   	@56
+libintl_rwlock_unlock   	@57
+libintl_rwlock_wrlock   	@58
+libintl_set_relocation_prefix	@59
+libintl_snprintf        	@60
+libintl_sprintf         	@61
+libintl_swprintf        	@62
+libintl_textdomain      	@63
+libintl_vasnprintf      	@64
+libintl_vasnwprintf     	@65
+libintl_version         	@66 DATA
+libintl_vfprintf        	@67
+libintl_vfwprintf       	@68
+libintl_vprintf         	@69
+libintl_vsnprintf       	@70
+libintl_vsprintf        	@71
+libintl_vswprintf       	@72
+libintl_vwprintf        	@73
+libintl_wprintf         	@74
+locale_charset          	@75
+ngettext                	@76
+textdomain              	@77

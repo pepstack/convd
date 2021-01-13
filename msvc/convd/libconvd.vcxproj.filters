@@ -1,0 +1,43 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="src">
+      <UniqueIdentifier>{6cd9287d-f1f6-4a43-c70f-6347dd1efbb7}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="src\common">
+      <UniqueIdentifier>{fda1feac-c20d-4a37-9140-dd7522be85bb}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="src\common\win32">
+      <UniqueIdentifier>{edeb7ded-c7e9-4794-acd6-31b386f04918}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="prepare.bat" />
+    <None Include="update.bat" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="..\..\src\common\emerglog.h">
+      <Filter>src\common</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\common\refcobject.h">
+      <Filter>src\common</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\convd\convd_api.h">
+      <Filter>src</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\convd\convd_i.h">
+      <Filter>src</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\common\win32\syslog.h">
+      <Filter>src\common\win32</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="..\..\src\convd\convd.c">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\common\win32\syslog-client.c">
+      <Filter>src\common\win32</Filter>
+    </ClCompile>
+  </ItemGroup>
+</Project>
