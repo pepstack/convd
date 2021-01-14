@@ -18,91 +18,250 @@ extern "C" {
 #include <stdlib.h>
 #include <string.h>
 
-#ifdef LIBCDPOOL_DLL
+#ifdef LIBCONVD_DLL
 /* win32 dynamic dll */
-# ifdef LIBCDPOOL_EXPORTS
-#   define CDPOOLAPI __declspec(dllexport)
+# ifdef LIBCONVD_EXPORTS
+#   define CONVDAPI __declspec(dllexport)
 # else
-#   define CDPOOLAPI __declspec(dllimport)
+#   define CONVDAPI __declspec(dllimport)
 # endif
 #else
 /* static lib or linux so */
-# define CDPOOLAPI  extern
+# define CONVDAPI  extern
 #endif
 
 
-typedef struct _conv_des_t    *convd_t;
+/**
+ * error codes
+ */
+#define CONVD_RET_NOERROR    0
+#define CONVD_RET_EICONV   (-1)
+#define CONVD_RET_EOPEN    (-1)
+#define CONVD_RET_EFROMCODE  1
+#define CONVD_RET_ETOCODE    2
+#define CONVD_RET_ESUFFIX    3
 
 
-typedef int CDP_SUFFIX;
+typedef struct _conv_descriptor_t    *convd_t;
+
 
 /**
- * No suffix string appended to tocode.
+ * Lists the supported encodings:
+ *   $ iconv --list
  */
-#define CDP_SUFFIX_NONE      0
+#define CVD_CODENAME_LEN_MAX  64
+
+
+typedef enum {
+    /**
+     * No suffix string appended to tocode.
+     */
+    CVD_SUFFIX_NONE =     0,
+
+    /**
+     * The string "//IGNORE" will be appended to tocode,
+     * This means that characters that cannot be represented in the target character
+     * set will be silently discarded.
+     */
+    CVD_SUFFIX_IGNORE =   1,
+
+    /**
+     * The string "//TRANSLIT" will be appended to tocode:
+     * This means that when a character cannot be represented in the target character
+     * set, it can be approximated through one or several similarly looking characters.
+     */
+    CVD_SUFFIX_TRANSLIT  = 2
+} CONVD_SUFFIX_MODE;
+
 
 /**
- * The string "//IGNORE" will be appended to tocode,
- * This means that characters that cannot be represented in the target character
- * set will be silently discarded.
+ * Unicode Character Set
  */
-#define CDP_SUFFIX_IGNORE    1
+typedef enum {
+    /**
+     * Byte Order Mark not found
+     */
+    UCS_BOM_NONE     = 0,
 
-/**
- * The string "//TRANSLIT" will be appended to tocode:
- * This means that when a character cannot be represented in the target character
- * set, it can be approximated through one or several similarly looking characters.
- */
-#define CDP_SUFFIX_TRANSLIT  2          
+    /**
+     * UTF-16BE: 'FE FF'
+     *   Sixteen-bit UCS Transformation Format, big-endian byte order
+     */
+    UCS_UTF_16BE     = 1,
+
+    /**
+     * UTF-16LE: 'FF FE'
+     *   Sixteen-bit UCS Transformation Format, little-endian byte order
+     */
+    UCS_UTF_16LE     = 2,
+
+    /**
+     * UTF-8: 'EF BB BF'
+     *   Eight-bit UCS Transformation Format
+     */
+    UCS_UTF_8BOM     = 3,
+
+    /**
+     * UTF-8?: 'EF BB ?'
+     *   Ask next one byte to determine if it is UTF_UTF_8BOM
+     */
+    UCS_UTF_8BOM_ASK = 4
+} CONVD_UCS_BOM;
 
 
 typedef struct
 {
     size_t blen;
-    char *blob;
+    char *bufp;
 } conv_buf_t;
 
+
 /**
- * Usage: UTF-8 to GBK
+ * Name
+ *   convd_create - create a new convd_t object.
  *
-    static void test_convd(int num)
-    {
-        // 临时变量
-        conv_buf_t input, output;
+ * Return Value
+ *   On success, it returns CONVD_RET_NOERROR(0) and *outcvd is a convd_t object;
+ *   On error, it returns an error code like CONVD_RET_E???, and the content of *outcvd is undefined.
+ *
+ * Errors
+ *
+ *   CONVD_RET_EFROMCODE - Invalid fromcode.
+ *   CONVD_RET_ETOCODE - Invalid tocode.
+ *   CONVD_RET_ESUFFIX - Invalid suffix argument.
+ *   CONVD_RET_EOPEN - Faile to call iconv_open. uses strerror(errno) to get more error details.
+ *
+ * Notes
+ *   convd_t object is MT-safety.
+ *
+ * Example
+ *
+ *   The program below demonstrates the use of convd_create(), as well as other
+ *    functions in the libconvd API.
+ *
+ *   The test_convd program shows how to do charset encodings conversion from UTF-8 to GBK.
+ *
+        void test_convd(int num)
+        {
+            // 创建转换器. 这个对象是线程安全的
+            convd_t cvd;
 
-        // 输入 UTF-8 字符串
-        char intext[] = "china中国";
+            int err = convd_create("UTF-8", "GB2312", CVD_SUFFIX_IGNORE, &cvd);
 
-        // 输出缓冲区的尺寸至少是输入长度的 4 倍
-        char outgbk[256];
+            if (err == CONVD_RET_NOERROR) {
+                // 临时变量
+                conv_buf_t input, output;
 
-        // 创建转换器. 这个对象是线程安全的
-        convd_t cvd = convd_create("UTF-8", "GB2312", 1);
+                // 输入 UTF-8 字符串
+                char intext[] = "china中国";
 
-        for (int i = 0; i < num; i++) {
-            int outlen = (int) convd_conv(cvd, conv_buf_set(&input, intext, strlen(intext)), conv_buf_set(&output, outgbk, sizeof(outgbk)));
+                // 输出缓冲区的尺寸至少是输入长度的 4 倍
+                char outgbk[256];
 
-            if (i % 20000 == 0) {
-                printf("[%d] outgbk={%.*s}\n", i, outlen, outgbk);
+                for (int i = 0; i < num; i++) {
+                    int outlen = (int) convd_conv_buf(cvd, conv_buf_set(&input, intext, strlen(intext)), conv_buf_set(&output, outgbk, sizeof(outgbk)));
+
+                    if (i % 20000 == 0) {
+                        printf("[%d] outgbk={%.*s}\n", i, outlen, outgbk);
+                    }
+                }
+
+                // 使用完毕一定要释放
+                convd_release(&cvd);
             }
         }
+ */
+CONVDAPI int convd_create(const char *fromcode, const char *tocode, CONVD_SUFFIX_MODE suffix, convd_t *outcvd);
 
-        // 使用完毕一定要释放
-        convd_release(&cvd);
-    }
-*/
+CONVDAPI convd_t convd_retain(convd_t *cvd);
+CONVDAPI void convd_release(convd_t *cvd);
+
+CONVDAPI const char * convd_fromcode(const convd_t cvd);
+CONVDAPI const char * convd_tocode(const convd_t cvd);
 
 
 /**
- * NOTES: convd_t is MT-safety
+ * Name
+ *   convd_config - control and query code conversion behavior.
+ *
+ * Synopsis
+ *   #include <iconv.h>
+ *   #include <convd_api.h>
+ *
+ *   int convd_config(const convd_t cvd, int request, void *arg);
+ *
+ * Description
+ *   The convd_config function is a direct wrapper of iconvctl() (see: iconv.h)
+ *    and can be used to control code conversion behavior by setting or getting
+ *    the current code conversion behavior settings from the current code
+ *    conversion pointed to by the conversion descriptor that was returned from
+ *    a successful convd_create call.
+ *
+ *   The following are the supported values for the request argument:
+ *    (See also: https://docs.oracle.com/cd/E36784_01/html/E36874/iconvctl-3c.html)
+ *
+ *      ICONV_GET_CONVERSION_BEHAVIOR
+ *      ICONV_SET_CONVERSION_BEHAVIOR
+ *      ICONV_GET_DISCARD_ILSEQ
+ *      ICONV_SET_DISCARD_ILSEQ
+ *      ICONV_GET_TRANSLITERATE
+ *      ICONV_SET_TRANSLITERATE
+ *      ICONV_TRIVIALP
+ *
+ * Return Value
+ *   Upon successful completion, convd_config() returns 0 and, optionally, with a
+ *    value pointed to by the arg argument. Otherwise, convd_config() returns -1
+ *    and sets errno to indicate the error.
+ *
+ * Notes
+ *   convd_config is MT-safety.
+ *
  */
+CONVDAPI int convd_config(const convd_t cvd, int request, void *argument);
 
-CDPOOLAPI convd_t convd_create(const char *fromcode, const char *tocode, CDP_SUFFIX suffix);
-CDPOOLAPI convd_t convd_retain(convd_t *cvd);
-CDPOOLAPI void convd_release(convd_t *cvd);
 
-CDPOOLAPI conv_buf_t * conv_buf_set(conv_buf_t *blob, char *arraybytes, size_t numbytes);
-CDPOOLAPI size_t convd_conv(convd_t cvd, conv_buf_t *input, conv_buf_t *output);
+CONVDAPI conv_buf_t * conv_buf_set(conv_buf_t *cvbuf, char *arraybytes, size_t numbytes);
+
+/**
+ * Name
+ *   convd_conv_buf - character set conversion.
+ *
+ * Return Value
+ *   On success, it returns length of bytes (not less than 0) successfully converted;
+ *   On error, it returns CONVD_RET_ECONV(-1) and caller can use strerror(errno) to
+ *    get more error details.
+ *
+ * Errors
+ *
+ *   CONVD_RET_EICONV - Faile to call iconv_open. uses strerror(errno) to get more error details.
+ *
+ * Notes
+ *   input and output should be changed after calling.
+ *
+ */
+CONVDAPI size_t convd_conv_buf(convd_t cvd, conv_buf_t *input, conv_buf_t *output);
+
+/**
+ * TODO:
+ */
+CONVDAPI size_t convd_conv_file(convd_t cvd, const char *textfilein, const char *textfileout, CONVD_UCS_BOM outfilebom);
+
+
+/**
+ * Name
+ *   ucs_bom_detect - detect buffer for bom header.
+ *   ucs_bom_detect_file - detect file for bom header.
+ *
+ * Return Value
+ *   Always returns one of CONVD_UCS_BOM.
+ *
+ * Errors
+ *
+ *   UCS_BOM_NONE - Faile to detect header.
+ */
+CONVDAPI CONVD_UCS_BOM ucs_bom_detect_buf(const conv_buf_t *header);
+
+CONVDAPI CONVD_UCS_BOM ucs_bom_detect_file(const char *textfile);
 
 #ifdef __cplusplus
 }

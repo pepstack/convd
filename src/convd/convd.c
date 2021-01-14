@@ -33,52 +33,91 @@
  */
 #include "convd_i.h"
 
-static void conv_des_cleanup (conv_des_t *cvd)
+
+static void convd_cleanup_cb (conv_descriptor_t *cvd)
 {
-    iconv_close(cvd->cd);
+    if (cvd->cd != CONVD_ERROR_ICONV) {
+        iconv_close(cvd->cd);
+    }
 }
 
 
 conv_buf_t * conv_buf_set(conv_buf_t *cvbuf, char *arraybytes, size_t numbytes)
 {
-    cvbuf->blob = arraybytes;
+    cvbuf->bufp = arraybytes;
     cvbuf->blen = numbytes;
     return cvbuf;
 }
 
 
-convd_t convd_create(const char *fromcode, const char *tocode, CDP_SUFFIX suffix)
+int convd_create(const char *fromcode, const char *tocode, CONVD_SUFFIX_MODE suffix, convd_t *outcvd)
 {
     convd_t cvd;
-    iconv_t cd;
 
-    if (suffix == CDP_SUFFIX_NONE) {
-        cd = iconv_open(tocode, fromcode);
-    } else {
-        char tobuf[128];
-        int len = cstr_length(tocode, 110);
+    int fromlen, tolen;
 
-        if (suffix == CDP_SUFFIX_IGNORE) {
-            snprintf_chkd_V1(tobuf, sizeof(tobuf), "%.*s//IGNORE", len, tocode, tocode);
-        } else if (suffix == CDP_SUFFIX_TRANSLIT) {
-            snprintf_chkd_V1(tobuf, sizeof(tobuf), "%.*s//TRANSLIT", len, tocode, tocode);
-        } else {
-            /* Invalid argument: errno = 0 */
-            return NULL;
+    fromlen = cstr_length(fromcode, CVD_CODENAME_LEN_MAX + 1);
+    if (fromlen < 1 || fromlen > CVD_CODENAME_LEN_MAX) {
+        /* invalid from code */
+        return CONVD_RET_EFROMCODE;
+    }
+
+    tolen = cstr_length(tocode, CVD_CODENAME_LEN_MAX + 1);
+    if (tolen < 1 || tolen > CVD_CODENAME_LEN_MAX) {
+        /* invalid to code */
+        return CONVD_RET_ETOCODE;
+    }
+
+    cvd = (conv_descriptor_t *)refc_object_new(0, sizeof(conv_descriptor_t) + fromlen + tolen + sizeof(char) * 12, convd_cleanup_cb);
+
+    cvd->cd = CONVD_ERROR_ICONV;
+
+    memcpy(cvd->codebuf, fromcode, fromlen);
+    cstr_toupper(cvd->codebuf, fromlen);
+
+    cvd->tocodeat = fromlen + 1;
+
+    if (suffix == CVD_SUFFIX_NONE) {
+        memcpy(&cvd->codebuf[cvd->tocodeat], tocode, tolen);
+        cstr_toupper(&cvd->codebuf[cvd->tocodeat], tolen);
+
+        cvd->cd = iconv_open(&cvd->codebuf[cvd->tocodeat], cvd->codebuf);
+
+        if (cvd->cd == CONVD_ERROR_ICONV) {
+            /* Faile to iconv_open. see: errno */
+            refc_object_dec((void**)&cvd);
+            return CONVD_RET_EOPEN;
         }
 
-        cd = iconv_open(tobuf, fromcode);
+        /* success */
+        *outcvd = cvd;
+        return CONVD_RET_NOERROR;
     }
 
-    if (cd == (iconv_t)(-1)) {
-        /* Faile to open. see: errno */
-        return NULL;
+    memcpy(&cvd->codebuf[cvd->tocodeat], tocode, tolen);
+    cstr_toupper(&cvd->codebuf[cvd->tocodeat], tolen);
+
+    if (suffix == CVD_SUFFIX_IGNORE) {
+        memcpy(&cvd->codebuf[cvd->tocodeat + tolen], "//IGNORE", 8);
+    } else if (suffix == CVD_SUFFIX_TRANSLIT) {
+        memcpy(&cvd->codebuf[cvd->tocodeat + tolen], "//TRANSLIT", 10);
+    } else {
+        /* Invalid suffix argument: errno = 0 */
+        refc_object_dec((void**)&cvd);
+        return CONVD_RET_ESUFFIX;
     }
 
-    cvd = (conv_des_t *)refc_object_new(0, sizeof(conv_des_t), conv_des_cleanup);
-    cvd->cd = cd;
+    cvd->cd = iconv_open(&cvd->codebuf[cvd->tocodeat], cvd->codebuf);
 
-    return cvd;
+    if (cvd->cd == CONVD_ERROR_ICONV) {
+        /* Faile to iconv_open. see: errno */
+        refc_object_dec((void**)&cvd);
+        return CONVD_RET_EOPEN;
+    }
+
+    /* success */
+    *outcvd = cvd;
+    return CONVD_RET_NOERROR;
 }
 
 
@@ -94,21 +133,45 @@ convd_t convd_retain(convd_t *cvd)
 }
 
 
-size_t convd_conv(convd_t cvd, conv_buf_t *input, conv_buf_t *output)
+const char * convd_fromcode(const convd_t cvd)
+{
+    return cvd->codebuf;
+}
+
+
+const char * convd_tocode(const convd_t cvd)
+{
+    return &cvd->codebuf[cvd->tocodeat];
+}
+
+
+int convd_config(const convd_t cvd, int request, void *argument)
+{
+    int ret;
+
+    refc_object_lock(cvd, 0);
+
+    ret = iconvctl(cvd->cd, request, argument);
+
+    refc_object_unlock(cvd);
+    return ret;
+}
+
+
+size_t convd_conv_buf(convd_t cvd, conv_buf_t *input, conv_buf_t *output)
 {
     size_t ret, outlen;
 
     refc_object_lock(cvd, 0);
 
     ret = iconv(cvd->cd, NULL, NULL, NULL, NULL);
-    if (ret == (size_t)(-1)) {
-        /* SHOULD NEVER RUN TO THIS! */
-        emerglog_exit("libconvd", "iconv error(%d): %s", errno, strerror(errno));
+    if (ret == CONVD_ERROR_SIZE) {
+        return CONVD_RET_EICONV;
     }
 
     outlen = output->blen;
 
-    while ((ret = iconv(cvd->cd, &input->blob, &input->blen, &output->blob, &output->blen)) != (size_t)(-1)) {
+    while ((ret = iconv(cvd->cd, &input->bufp, &input->blen, &output->bufp, &output->blen)) != CONVD_ERROR_SIZE) {
         if (input->blen == 0) {
             refc_object_unlock(cvd);
 
@@ -120,6 +183,77 @@ size_t convd_conv(convd_t cvd, conv_buf_t *input, conv_buf_t *output)
 
     refc_object_unlock(cvd);
 
-    // error( -1 )
-    return (size_t)(-1);
+    // failed
+    return CONVD_RET_EICONV;
+}
+
+
+CONVD_UCS_BOM ucs_bom_detect_buf(const conv_buf_t *header)
+{
+    if (header->blen > 1) {
+        if ((unsigned char)header->bufp[0] == 0xFE &&
+            (unsigned char)header->bufp[1] == 0xFF) {
+            return UCS_UTF_16BE;
+        }
+
+        if ((unsigned char)header->bufp[0] == 0xFF &&
+            (unsigned char)header->bufp[1] == 0xFE) {
+            return UCS_UTF_16LE;
+        }
+
+        if ((unsigned char)header->bufp[0] == 0xEF &&
+            (unsigned char)header->bufp[1] == 0xBB) {
+            if (header->blen == 2) {
+                /* need one more byte */
+                return UCS_UTF_8BOM_ASK;
+            }
+
+            if ((unsigned char)header->bufp[2] == 0xBF) {
+                return UCS_UTF_8BOM;
+            }
+        }
+    }
+
+    return UCS_BOM_NONE;
+}
+
+
+CONVDAPI CONVD_UCS_BOM ucs_bom_detect_file(const char *textfile)
+{
+    int bom = UCS_BOM_NONE;
+
+    filehandle_t hf = file_open_read(textfile);
+
+    if (hf != filehandle_invalid) {
+        conv_buf_t headbuf;
+        char header[4] = {0x00, 0x00, 0x00, 0x00};
+
+        /* try to read first 2 bytes */
+        if (file_readbytes(hf, header, 2) == 2) {
+            bom = ucs_bom_detect_buf(conv_buf_set(&headbuf, header, 2));
+
+            if (bom == UCS_BOM_NONE) {
+                goto finish_done;
+            }
+            if (bom != UCS_UTF_8BOM_ASK) {
+                goto finish_done;
+            }
+            if (file_readbytes(hf, &header[2], 1) == 1) {
+                bom = ucs_bom_detect_buf(conv_buf_set(&headbuf, header, 3));
+            }
+        }
+    }
+
+finish_done:
+    file_close(&hf);
+    return bom;
+}
+
+
+size_t convd_conv_file(convd_t cvd, const char *textfilein, const char *textfileout, CONVD_UCS_BOM outfilebom)
+{
+    // TODO:
+    ucs_bom_detect_file(textfilein);
+
+    return -1;
 }

@@ -25,11 +25,18 @@ extern "C" {
 
 #include "convd_api.h"
 
+#define CONVD_ERROR_ICONV    ((iconv_t)(-1))
 
-typedef struct _conv_des_t
+#define CONVD_ERROR_SIZE     ((size_t)(-1))
+
+
+typedef struct _conv_descriptor_t
 {
     iconv_t cd;
-} conv_des_t;
+
+    int tocodeat;
+    char codebuf[0];
+} conv_descriptor_t;
 
 
 #ifdef __cplusplus

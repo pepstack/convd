@@ -230,11 +230,8 @@
     <ClCompile Include="..\..\src\convd\convd.c" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="..\..\src\common\win32\syslog.h" />
     <ClInclude Include="..\..\src\convd\convd_i.h" />
     <ClInclude Include="..\..\src\convd\convd_api.h" />
-    <ClInclude Include="..\..\src\common\emerglog.h" />
-    <ClInclude Include="..\..\src\common\refcobject.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

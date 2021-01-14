@@ -16,20 +16,27 @@
 #define  NUMTHREADS   10
 #define  MAXMSGCOUNT  (1000000 * 1)
 
+void test_textfile();
 
 static void do_convert(convd_t cvd, int num)
 {
     char intext[] = "china中国";
+
     char outgbk[256];
+    size_t outlen;
 
     int i = 0;
     conv_buf_t input, output;
 
     for (; i < num; i++) {
-        int outlen = (int) convd_conv(cvd, conv_buf_set(&input, intext, strlen(intext)), conv_buf_set(&output, outgbk, sizeof(outgbk)));
+        outlen = convd_conv_buf(cvd, conv_buf_set(&input, intext, strlen(intext)), conv_buf_set(&output, outgbk, sizeof(outgbk)));
+        if (outlen == CONVD_RET_EICONV) {
+            printf("convd_conv_buf error(CONVD_RET_EICONV): %s\n", strerror(errno));
+            break;
+        }
 
         if (i % 100000 == 0) {
-            printf("[%d] output={%.*s}\n", i, outlen, outgbk);
+            printf("[%d] output={%.*s}\n", i, (int)outlen, outgbk);
         }
     }
 }
@@ -46,15 +53,33 @@ static void * convd_thread (void *arg)
 }
 
 
+
+
 int main (int argc, const char *argv[])
 {
     WINDOWS_CRTDBG_ON
 
-    int i;
-    pthread_t tids[NUMTHREADS] = {0};
-    convd_t cvd = convd_create("UTF-8", "GB2312", 1);
+    int err, i;
+    size_t count;
 
-    time_t t0 = time(0);
+    convd_t cvd;
+
+    time_t t0, t1;
+
+    pthread_t tids[NUMTHREADS] = {0};
+
+    err = convd_create("UTF-8", "GB2312", 1, &cvd);
+    if (err) {
+        if (err == CONVD_RET_EOPEN) {
+            printf("convd_create error(CONVD_RET_EOPEN): %s\n", strerror(errno));
+        } else {
+            printf("convd_create error(%d).\n", err);
+        }
+
+        exit(EXIT_FAILURE);
+    }
+
+    t0 = time(0);
 
     for (i = 0; i < NUMTHREADS; i++) {
         if (pthread_create(&tids[i], NULL, convd_thread, (void*)convd_retain(&cvd)) == -1) {
@@ -71,13 +96,75 @@ int main (int argc, const char *argv[])
         }
     }
 
+    t1 = time(0);
+    count = (size_t)(NUMTHREADS * MAXMSGCOUNT);
+
+    printf("Conversion from '%s' to '%s' end.\n", convd_fromcode(cvd), convd_tocode(cvd));
+    printf("Elapsed: %d seconds. Speed: %d/Sec.\n\n", (int)(t1-t0), (int) (count/(t1-t0 + 0.01)));
+
     convd_release(&cvd);
 
-    time_t t1 = time(0);
-    size_t count = (size_t)(NUMTHREADS * MAXMSGCOUNT);
-    printf("Elapsed: %d seconds. Speed: %d/Sec.\n\n", (int)(t1-t0), (int) (count/(t1-t0 + 0.01)));
+    test_textfile();
 
     system("pause");
     return 0;
 }
 
+
+void test_textfile()
+{
+    CONVD_UCS_BOM bom;
+    char *endp;
+
+    int backslash = 0;
+    cstrbuf apppath = get_proc_abspath();
+
+    printf("%s path: %.*s\n\n", APPNAME, cstrbufGetLen(apppath), cstrbufGetStr(apppath));
+
+    endp = strstr(apppath->str, "/test/");
+    if (! endp) {
+        backslash = -1;
+        endp = strstr(apppath->str, "\\test\\");
+        if (endp) {
+            backslash = 1;
+        }
+    }
+
+    if (backslash != -1) {
+        cstrbuf textfile;
+
+        endp += 6;
+        *endp = 0;
+
+        textfile = cstrbufCat(NULL, "%sucs-2be.txt", apppath->str);
+        bom = ucs_bom_detect_file(textfile->str);
+        printf("bom=%d file=%.*s\n", bom, cstrbufGetLen(textfile), cstrbufGetStr(textfile));
+        cstrbufFree(&textfile);
+        assert(bom == UCS_UTF_16BE);
+
+        textfile = cstrbufCat(NULL, "%sucs-2le.txt", apppath->str);
+        bom = ucs_bom_detect_file(textfile->str);
+        printf("bom=%d file=%.*s\n", bom, cstrbufGetLen(textfile), cstrbufGetStr(textfile));
+        cstrbufFree(&textfile);
+        assert(bom == UCS_UTF_16LE);
+
+        textfile = cstrbufCat(NULL, "%sutf-8bom.txt", apppath->str);
+        bom = ucs_bom_detect_file(textfile->str);
+        printf("bom=%d file=%.*s\n", bom, cstrbufGetLen(textfile), cstrbufGetStr(textfile));
+        cstrbufFree(&textfile);
+        assert(bom == UCS_UTF_8BOM);
+
+        textfile = cstrbufCat(NULL, "%sutf-8.txt", apppath->str);
+        bom = ucs_bom_detect_file(textfile->str);
+        printf("bom=%d file=%.*s\n", bom, cstrbufGetLen(textfile), cstrbufGetStr(textfile));
+        cstrbufFree(&textfile);
+        assert(bom == UCS_BOM_NONE);
+
+        textfile = cstrbufCat(NULL, "%sgb2312.txt", apppath->str);
+        bom = ucs_bom_detect_file(textfile->str);
+        printf("bom=%d file=%.*s\n", bom, cstrbufGetLen(textfile), cstrbufGetStr(textfile));
+        cstrbufFree(&textfile);
+        assert(bom == UCS_BOM_NONE);
+    }
+    cstrbufFree(&apppath);
+}
