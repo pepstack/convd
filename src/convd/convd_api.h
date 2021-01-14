@@ -37,9 +37,8 @@ extern "C" {
 #define CONVD_RET_NOERROR    0
 #define CONVD_RET_EICONV   (-1)
 #define CONVD_RET_EOPEN    (-1)
-#define CONVD_RET_EFROMCODE  1
-#define CONVD_RET_ETOCODE    2
-#define CONVD_RET_ESUFFIX    3
+#define CONVD_RET_EENCODING  1
+#define CONVD_RET_ESUFFIX    2
 
 
 typedef struct _conv_descriptor_t    *convd_t;
@@ -49,7 +48,7 @@ typedef struct _conv_descriptor_t    *convd_t;
  * Lists the supported encodings:
  *   $ iconv --list
  */
-#define CVD_CODENAME_LEN_MAX  64
+#define CVD_ENCODING_NAME_LEN  64
 
 
 typedef enum {
@@ -84,28 +83,40 @@ typedef enum {
     UCS_BOM_NONE     = 0,
 
     /**
-     * UTF-16BE: 'FE FF'
-     *   Sixteen-bit UCS Transformation Format, big-endian byte order
+     * UTF-8: 'EF BB BF'
+     *   8-bit UCS Transformation Format with BOM header
      */
-    UCS_UTF_16BE     = 1,
+    UCS_UTF_8BOM     = 1,
+
+    /**
+     * UTF-16BE: 'FE FF'
+     *   16-bit UCS Transformation Format, big-endian byte order
+     */
+    UCS_UTF_16BE     = 2,
 
     /**
      * UTF-16LE: 'FF FE'
-     *   Sixteen-bit UCS Transformation Format, little-endian byte order
+     *   16-bit UCS Transformation Format, little-endian byte order
      */
-    UCS_UTF_16LE     = 2,
+    UCS_UTF_16LE     = 3,
 
     /**
-     * UTF-8: 'EF BB BF'
-     *   Eight-bit UCS Transformation Format
+     * UTF-32BE: '00 00 FE FF'
+     *   32-bit UCS Transformation Format, big-endian byte order
      */
-    UCS_UTF_8BOM     = 3,
+    UCS_UTF_32BE     = 4,
+
+    /**
+     * UTF-32LE: 'FF FE 00 00'
+     *   32-bit UCS Transformation Format, little-endian byte order
+     */
+    UCS_UTF_32LE     = 5,
 
     /**
      * UTF-8?: 'EF BB ?'
      *   Ask next one byte to determine if it is UTF_UTF_8BOM
      */
-    UCS_UTF_8BOM_ASK = 4
+    UCS_UTF_8BOM_ASK = 6
 } CONVD_UCS_BOM;
 
 
@@ -126,8 +137,7 @@ typedef struct
  *
  * Errors
  *
- *   CONVD_RET_EFROMCODE - Invalid fromcode.
- *   CONVD_RET_ETOCODE - Invalid tocode.
+ *   CONVD_RET_EENCODING - Invalid fromcode or tocode.
  *   CONVD_RET_ESUFFIX - Invalid suffix argument.
  *   CONVD_RET_EOPEN - Faile to call iconv_open. uses strerror(errno) to get more error details.
  *
@@ -243,6 +253,7 @@ CONVDAPI size_t convd_conv_buf(convd_t cvd, conv_buf_t *input, conv_buf_t *outpu
 
 /**
  * TODO:
+ *   https://worthsen.blog.csdn.net/article/details/86585271
  */
 CONVDAPI size_t convd_conv_file(convd_t cvd, const char *textfilein, const char *textfileout, CONVD_UCS_BOM outfilebom);
 
@@ -262,6 +273,11 @@ CONVDAPI size_t convd_conv_file(convd_t cvd, const char *textfilein, const char 
 CONVDAPI CONVD_UCS_BOM ucs_bom_detect_buf(const conv_buf_t *header);
 
 CONVDAPI CONVD_UCS_BOM ucs_bom_detect_file(const char *textfile);
+
+
+CONVDAPI int encoding_detect_xmlbuf(const conv_buf_t *xmlbuf, char encoding[CVD_ENCODING_NAME_LEN + 1], CONVD_UCS_BOM *bomhdr);
+
+CONVDAPI int encoding_detect_xmlfile(const char *xmlfile, char encoding[CVD_ENCODING_NAME_LEN + 1], CONVD_UCS_BOM *bomhdr);
 
 #ifdef __cplusplus
 }

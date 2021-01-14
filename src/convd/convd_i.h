@@ -20,6 +20,7 @@ extern "C" {
 #include <common/memapi.h>
 #include <common/emerglog.h>
 #include <common/refcobject.h>
+#include <common/bo.h>
 
 #include <iconv.h>
 

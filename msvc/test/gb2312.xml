@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="GB2312" ?>
+<books>
+  <book>
+    <author>李刚</author>
+    <title>疯狂XML讲义</title>
+    <publisher>电子工业出版社</publisher>
+  </book>
+  <book>
+    <author>Developer</author>
+    <title>XML格式化工具</title>
+    <publisher>ip138.com</publisher>
+  </book>
+</books>

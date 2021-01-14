@@ -56,16 +56,16 @@ int convd_create(const char *fromcode, const char *tocode, CONVD_SUFFIX_MODE suf
 
     int fromlen, tolen;
 
-    fromlen = cstr_length(fromcode, CVD_CODENAME_LEN_MAX + 1);
-    if (fromlen < 1 || fromlen > CVD_CODENAME_LEN_MAX) {
+    fromlen = cstr_length(fromcode, CVD_ENCODING_NAME_LEN + 1);
+    if (fromlen < 1 || fromlen > CVD_ENCODING_NAME_LEN) {
         /* invalid from code */
-        return CONVD_RET_EFROMCODE;
+        return CONVD_RET_EENCODING;
     }
 
-    tolen = cstr_length(tocode, CVD_CODENAME_LEN_MAX + 1);
-    if (tolen < 1 || tolen > CVD_CODENAME_LEN_MAX) {
+    tolen = cstr_length(tocode, CVD_ENCODING_NAME_LEN + 1);
+    if (tolen < 1 || tolen > CVD_ENCODING_NAME_LEN) {
         /* invalid to code */
-        return CONVD_RET_ETOCODE;
+        return CONVD_RET_EENCODING;
     }
 
     cvd = (conv_descriptor_t *)refc_object_new(0, sizeof(conv_descriptor_t) + fromlen + tolen + sizeof(char) * 12, convd_cleanup_cb);
@@ -247,6 +247,105 @@ CONVDAPI CONVD_UCS_BOM ucs_bom_detect_file(const char *textfile)
 finish_done:
     file_close(&hf);
     return bom;
+}
+
+
+int encoding_detect_xmlbuf(const conv_buf_t *xmlbuf, char encoding[CVD_ENCODING_NAME_LEN + 1], CONVD_UCS_BOM *bomhdr)
+{
+    CONVD_UCS_BOM bom = ucs_bom_detect_buf(xmlbuf);
+
+    int i, rlen;
+    int16_t wch;
+
+    char xmlhead[40 + CVD_ENCODING_NAME_LEN];
+
+    if (bom == UCS_UTF_16BE || bom == UCS_UTF_16LE) {
+        i = 2;
+
+        rlen = 0;
+        while (i < xmlbuf->blen) {
+            wch = (bom == UCS_UTF_16BE ? BO_bytes_betoh_i16(&xmlbuf->bufp[i]) : BO_bytes_letoh_i16(&xmlbuf->bufp[i]));
+
+            i++;
+
+            xmlhead[rlen++] = (char)(0xFF & wch);
+
+            if (rlen >= sizeof(xmlhead)) {
+                break;
+            }
+        }
+
+        if (rlen > 30) {
+            char *start = strstr(xmlhead, " encoding=\"");
+            if (start) {
+                char *end;
+                start += 11;
+                end = strchr(start, '"');
+
+                rlen = (int)(end - start);
+                if (end && rlen > 0 && rlen <= CVD_ENCODING_NAME_LEN) {
+                    memcpy(encoding, start, rlen);
+                    encoding[rlen] = 0;
+
+                    if (bomhdr) {
+                        *bomhdr = bom;
+                    }
+                    return CONVD_RET_NOERROR;
+                }
+            }
+        }
+    } else if (bom == UCS_UTF_8BOM) {
+        if (xmlbuf->blen > 30) {
+            char *start = strstr(&xmlbuf->bufp[3], " encoding=\"");
+            if (start) {
+                char *end;
+                start += 11;
+                end = strchr(start, '"');
+
+                rlen = (int)(end - start);
+                if (end && rlen > 0 && rlen <= CVD_ENCODING_NAME_LEN) {
+                    memcpy(encoding, start, rlen);
+                    encoding[rlen] = 0;
+
+                    if (bomhdr) {
+                        *bomhdr = bom;
+                    }
+                    return CONVD_RET_NOERROR;
+                }
+            }
+        }
+    } else {
+        // TODO: https://worthsen.blog.csdn.net/article/details/86585271
+    }
+
+    if (bomhdr) {
+        *bomhdr = bom;
+    }
+    return CONVD_RET_EENCODING;
+}
+
+
+int encoding_detect_xmlfile(const char *xmlfile, char encoding[CVD_ENCODING_NAME_LEN + 1], CONVD_UCS_BOM *bomhdr)
+{
+    filehandle_t hf = file_open_read(xmlfile);
+
+    if (hf != filehandle_invalid) {
+        char xmlhead[40 + CVD_ENCODING_NAME_LEN];
+
+        /* try to read first 2 bytes */
+        int rdlen = file_readbytes(hf, xmlhead, sizeof(xmlhead));
+
+        file_close(&hf);
+
+        if (rdlen > 30) {
+            conv_buf_t xmlbuf;
+            return encoding_detect_xmlbuf(conv_buf_set(&xmlbuf, xmlhead, rdlen), encoding, bomhdr);
+        }
+
+        return CONVD_RET_EENCODING;
+    }
+
+    return CONVD_RET_EOPEN;
 }
 
 

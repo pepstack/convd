@@ -13,7 +13,7 @@
 #include <convd/convd_api.h>
 
 /* should changed as your want ! */
-#define  NUMTHREADS   10
+#define  NUMTHREADS   1
 #define  MAXMSGCOUNT  (1000000 * 1)
 
 void test_textfile();
@@ -131,7 +131,9 @@ void test_textfile()
     }
 
     if (backslash != -1) {
+        int rc;
         cstrbuf textfile;
+        char encoding[CVD_ENCODING_NAME_LEN + 1];
 
         endp += 6;
         *endp = 0;
@@ -165,6 +167,13 @@ void test_textfile()
         printf("bom=%d file=%.*s\n", bom, cstrbufGetLen(textfile), cstrbufGetStr(textfile));
         cstrbufFree(&textfile);
         assert(bom == UCS_BOM_NONE);
+
+        textfile = cstrbufCat(NULL, "%sutf8bom.xml", apppath->str);
+        rc = encoding_detect_xmlfile(textfile->str, encoding, &bom);
+        if (rc == CONVD_RET_NOERROR) {
+            printf("bom=%d encoding=%s file=%.*s\n", bom, encoding, cstrbufGetLen(textfile), cstrbufGetStr(textfile));
+        }
+        cstrbufFree(&textfile);
     }
     cstrbufFree(&apppath);
 }
