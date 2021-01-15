@@ -30,5 +30,8 @@
     <ClCompile Include="..\..\src\common\win32\syslog-client.c">
       <Filter>src\common\win32</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\src\convd\codec.c">
+      <Filter>src</Filter>
+    </ClCompile>
   </ItemGroup>
 </Project>

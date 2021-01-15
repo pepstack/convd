@@ -29,9 +29,9 @@ static void do_convert(convd_t cvd, int num)
     conv_buf_t input, output;
 
     for (; i < num; i++) {
-        outlen = convd_conv_buf(cvd, conv_buf_set(&input, intext, strlen(intext)), conv_buf_set(&output, outgbk, sizeof(outgbk)));
+        outlen = convd_conv_text(cvd, conv_buf_set(&input, intext, strlen(intext)), conv_buf_set(&output, outgbk, sizeof(outgbk)));
         if (outlen == CONVD_RET_EICONV) {
-            printf("convd_conv_buf error(CONVD_RET_EICONV): %s\n", strerror(errno));
+            printf("convd_conv_text error(CONVD_RET_EICONV): %s\n", strerror(errno));
             break;
         }
 
@@ -133,47 +133,47 @@ void test_textfile()
     if (backslash != -1) {
         int rc;
         cstrbuf textfile;
-        char encoding[CVD_ENCODING_NAME_LEN + 1];
+        char encoding[CVD_ENCODING_LEN_MAX + 1];
 
         endp += 6;
         *endp = 0;
 
         textfile = cstrbufCat(NULL, "%sucs-2be.txt", apppath->str);
-        bom = ucs_bom_detect_file(textfile->str);
+        bom = UCS_file_detect_bom(textfile->str);
         printf("bom=%d file=%.*s\n", bom, cstrbufGetLen(textfile), cstrbufGetStr(textfile));
         cstrbufFree(&textfile);
         assert(bom == UCS_UTF_16BE);
 
         textfile = cstrbufCat(NULL, "%sucs-2le.txt", apppath->str);
-        bom = ucs_bom_detect_file(textfile->str);
+        bom = UCS_file_detect_bom(textfile->str);
         printf("bom=%d file=%.*s\n", bom, cstrbufGetLen(textfile), cstrbufGetStr(textfile));
         cstrbufFree(&textfile);
         assert(bom == UCS_UTF_16LE);
 
         textfile = cstrbufCat(NULL, "%sutf-8bom.txt", apppath->str);
-        bom = ucs_bom_detect_file(textfile->str);
+        bom = UCS_file_detect_bom(textfile->str);
         printf("bom=%d file=%.*s\n", bom, cstrbufGetLen(textfile), cstrbufGetStr(textfile));
         cstrbufFree(&textfile);
         assert(bom == UCS_UTF_8BOM);
 
         textfile = cstrbufCat(NULL, "%sutf-8.txt", apppath->str);
-        bom = ucs_bom_detect_file(textfile->str);
+        bom = UCS_file_detect_bom(textfile->str);
         printf("bom=%d file=%.*s\n", bom, cstrbufGetLen(textfile), cstrbufGetStr(textfile));
         cstrbufFree(&textfile);
         assert(bom == UCS_BOM_NONE);
 
         textfile = cstrbufCat(NULL, "%sgb2312.txt", apppath->str);
-        bom = ucs_bom_detect_file(textfile->str);
+        bom = UCS_file_detect_bom(textfile->str);
         printf("bom=%d file=%.*s\n", bom, cstrbufGetLen(textfile), cstrbufGetStr(textfile));
         cstrbufFree(&textfile);
         assert(bom == UCS_BOM_NONE);
 
-        textfile = cstrbufCat(NULL, "%sutf8bom.xml", apppath->str);
-        rc = encoding_detect_xmlfile(textfile->str, encoding, &bom);
-        if (rc == CONVD_RET_NOERROR) {
-            printf("bom=%d encoding=%s file=%.*s\n", bom, encoding, cstrbufGetLen(textfile), cstrbufGetStr(textfile));
-        }
-        cstrbufFree(&textfile);
+       // textfile = cstrbufCat(NULL, "%sutf8bom.xml", apppath->str);
+       // rc = encoding_detect_xmlfile(textfile->str, encoding, &bom);
+       // if (rc == CONVD_RET_NOERROR) {
+       //     printf("bom=%d encoding=%s file=%.*s\n", bom, encoding, cstrbufGetLen(textfile), cstrbufGetStr(textfile));
+       // }
+       // cstrbufFree(&textfile);
     }
     cstrbufFree(&apppath);
 }

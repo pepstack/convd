@@ -45,10 +45,11 @@ typedef struct _conv_descriptor_t    *convd_t;
 
 
 /**
+ * max length for charset encoding including end null char.
  * Lists the supported encodings:
  *   $ iconv --list
  */
-#define CVD_ENCODING_NAME_LEN  64
+#define CVD_ENCODING_LEN_MAX  64
 
 
 typedef enum {
@@ -127,6 +128,13 @@ typedef struct
 } conv_buf_t;
 
 
+typedef struct
+{
+    char version[16];
+    char encoding[CVD_ENCODING_LEN_MAX];
+} conv_xmlhead_t;
+
+
 /**
  * Name
  *   convd_create - create a new convd_t object.
@@ -169,7 +177,7 @@ typedef struct
                 char outgbk[256];
 
                 for (int i = 0; i < num; i++) {
-                    int outlen = (int) convd_conv_buf(cvd, conv_buf_set(&input, intext, strlen(intext)), conv_buf_set(&output, outgbk, sizeof(outgbk)));
+                    int outlen = (int) convd_conv_text(cvd, conv_buf_set(&input, intext, strlen(intext)), conv_buf_set(&output, outgbk, sizeof(outgbk)));
 
                     if (i % 20000 == 0) {
                         printf("[%d] outgbk={%.*s}\n", i, outlen, outgbk);
@@ -234,7 +242,7 @@ CONVDAPI conv_buf_t * conv_buf_set(conv_buf_t *cvbuf, char *arraybytes, size_t n
 
 /**
  * Name
- *   convd_conv_buf - character set conversion.
+ *   convd_conv_text - character set conversion.
  *
  * Return Value
  *   On success, it returns length of bytes (not less than 0) successfully converted;
@@ -249,7 +257,7 @@ CONVDAPI conv_buf_t * conv_buf_set(conv_buf_t *cvbuf, char *arraybytes, size_t n
  *   input and output should be changed after calling.
  *
  */
-CONVDAPI size_t convd_conv_buf(convd_t cvd, conv_buf_t *input, conv_buf_t *output);
+CONVDAPI size_t convd_conv_text(convd_t cvd, conv_buf_t *input, conv_buf_t *output);
 
 /**
  * TODO:
@@ -260,8 +268,8 @@ CONVDAPI size_t convd_conv_file(convd_t cvd, const char *textfilein, const char 
 
 /**
  * Name
- *   ucs_bom_detect - detect buffer for bom header.
- *   ucs_bom_detect_file - detect file for bom header.
+ *   UCS_text_detect_bom - detect text buffer for bom tag.
+ *   UCS_file_detect_bom - detect file for bom tag.
  *
  * Return Value
  *   Always returns one of CONVD_UCS_BOM.
@@ -270,14 +278,26 @@ CONVDAPI size_t convd_conv_file(convd_t cvd, const char *textfilein, const char 
  *
  *   UCS_BOM_NONE - Faile to detect header.
  */
-CONVDAPI CONVD_UCS_BOM ucs_bom_detect_buf(const conv_buf_t *header);
+CONVDAPI CONVD_UCS_BOM UCS_text_detect_bom(const conv_buf_t *textbuf);
 
-CONVDAPI CONVD_UCS_BOM ucs_bom_detect_file(const char *textfile);
+CONVDAPI CONVD_UCS_BOM UCS_file_detect_bom(const char *pathfile);
 
 
-CONVDAPI int encoding_detect_xmlbuf(const conv_buf_t *xmlbuf, char encoding[CVD_ENCODING_NAME_LEN + 1], CONVD_UCS_BOM *bomhdr);
+/**
+ * Name
+ *   UCS_text_detect_bom - detect text buffer for bom tag.
+ *   UCS_file_detect_bom - detect file for bom tag.
+ *
+ * Return Value
+ *   Always returns one of CONVD_UCS_BOM.
+ *
+ * Errors
+ *
+ *   UCS_BOM_NONE - Faile to detect header.
+ */
+CONVDAPI int XML_text_parse_head(const conv_buf_t *xmltext, conv_xmlhead_t *xmlhead, CONVD_UCS_BOM *bomtag);
 
-CONVDAPI int encoding_detect_xmlfile(const char *xmlfile, char encoding[CVD_ENCODING_NAME_LEN + 1], CONVD_UCS_BOM *bomhdr);
+CONVDAPI int XML_file_parse_head(const char *xmlfile, conv_xmlhead_t *xmlhead, CONVD_UCS_BOM *bomtag);
 
 #ifdef __cplusplus
 }

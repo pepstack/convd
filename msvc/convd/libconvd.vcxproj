@@ -228,6 +228,7 @@
   <ItemGroup>
     <ClCompile Include="..\..\src\common\win32\syslog-client.c" />
     <ClCompile Include="..\..\src\convd\convd.c" />
+    <ClCompile Include="..\..\src\convd\codec.c" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\src\convd\convd_i.h" />
