@@ -37,7 +37,7 @@
 CONVD_UCS_BOM UCS_text_detect_bom(const conv_buf_t *header)
 {
     if (header->blen > 1) {
-         if ((ub1)header->bufp[0] == 0xFE && (ub1)header->bufp[1] == 0xFF) {
+        if ((ub1)header->bufp[0] == 0xFE && (ub1)header->bufp[1] == 0xFF) {
             return UCS_2BE_BOM;
         }
 
@@ -106,33 +106,63 @@ CONVDAPI int UCS_file_detect_bom(const char *textfile, CONVD_UCS_BOM *outbom)
 
 int XML_text_parse_head(const conv_buf_t *xmltext, conv_xmlhead_t *xmlhead, CONVD_UCS_BOM *bomtag)
 {
+    char *start, *end;
+ 
     CONVD_UCS_BOM bom = UCS_text_detect_bom(xmltext);
 
-    switch (bom) {
-    case UCS_UTF8_BOM:
-        break;
-
-    case UCS_2BE_BOM:
-        break;
-
-    case UCS_2LE_BOM:
-        break;
-
-    case UCS_4BE_BOM:
-        break;
-
-    case UCS_4LE_BOM:
-        break;
-
-    case UCS_NONE_BOM:
-    default:
-        break;
-    }
+    size_t offset = 0;
 
     if (bomtag) {
         *bomtag = bom;
     }
 
+    memset(xmlhead, 0, sizeof(*xmlhead));
+
+    switch (bom) {
+    case UCS_2BE_BOM:
+        offset = 2;
+        break;
+
+    case UCS_2LE_BOM:
+        offset = 2;
+        break;
+
+    case UCS_4BE_BOM:
+        offset = 4;
+        break;
+
+    case UCS_4LE_BOM:
+        offset = 4;
+        break;
+
+    case UCS_UTF8_BOM:
+        offset = 3;
+    case UCS_NONE_BOM:
+    default:
+        start = strstr(xmltext->bufp + offset, "<?xml ");
+        end = strstr(xmltext->bufp + offset, "?>");
+        if (start && end && start < end) {
+            char * ver = strstr(start, " version=\"");
+            if (ver && ver > start && ver < end) {
+                char *vend = strstr(&ver[10], "\"");
+                if (vend && vend < end) {
+                    strncpy(xmlhead->version, &ver[10], vend - ver - 10);
+                }
+            }
+
+            char * enc = strstr(start, " encoding=\"");
+            if (enc) {
+                char *vend = strstr(&enc[11], "\"");
+                if (vend && vend < end) {
+                    strncpy(xmlhead->encoding, &enc[11], vend - enc - 11);
+                }
+            }
+            return (int)(offset + (int)(end - start) + 2);
+        }
+        break;
+    }
+
+    /* xml head not found */
     return 0;
 }
 

@@ -30,6 +30,10 @@ extern "C" {
 
 #define CONVD_ERROR_SIZE     ((size_t)(-1))
 
+#define CONV_CONTINUE       1
+#define CONV_FINISHED       0
+#define CONV_EBREAK       (-1)
+
 
 typedef struct _conv_descriptor_t
 {
@@ -38,6 +42,14 @@ typedef struct _conv_descriptor_t
     int tocodeat;
     char codebuf[0];
 } conv_descriptor_t;
+
+
+typedef struct _conv_position_t
+{
+    filehandle_t textfd;
+    CONVD_UCS_BOM bom;
+    sb8 offset;
+} conv_position_t, *convpos_t;
 
 
 #ifdef __cplusplus

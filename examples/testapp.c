@@ -116,7 +116,7 @@ void test_textfile()
     CONVD_UCS_BOM bom;
     char *endp;
 
-    int backslash = 0;
+    int err, backslash = 0;
     cstrbuf apppath = get_proc_abspath();
 
     printf("%s path: %.*s\n\n", APPNAME, cstrbufGetLen(apppath), cstrbufGetStr(apppath));
@@ -172,6 +172,32 @@ void test_textfile()
        //     printf("bom=%d encoding=%s file=%.*s\n", bom, encoding, cstrbufGetLen(textfile), cstrbufGetStr(textfile));
        // }
        // cstrbufFree(&textfile);
+
+        conv_xmlhead_t xmlhead;
+        textfile = cstrbufCat(NULL, "%sutf8.xml", apppath->str);
+        if (XML_file_parse_head(textfile->str, &xmlhead, NULL) > 0) {
+            printf("<?xml version=\"%s\" encoding=\"%s\"?>\n", xmlhead.version, xmlhead.encoding);
+        }
+        cstrbufFree(&textfile);
+
+        textfile = cstrbufCat(NULL, "%sgbk.xml", apppath->str);
+        if (XML_file_parse_head(textfile->str, &xmlhead, NULL) > 0) {
+            printf("<?xml version=\"%s\" encoding=\"%s\"?>\n", xmlhead.version, xmlhead.encoding);
+        }
+        cstrbufFree(&textfile);
+
+        textfile = cstrbufCat(NULL, "%sgb2312.xml", apppath->str);
+        if (XML_file_parse_head(textfile->str, &xmlhead, NULL) > 0) {
+            printf("<?xml version=\"%s\" encoding=\"%s\"?>\n", xmlhead.version, xmlhead.encoding);
+        }
+        cstrbufFree(&textfile);
+
+        convd_t cvd;
+        err = convd_create("GB18030", "UTF-8", 1, &cvd);
+        textfile = cstrbufCat(NULL, "%sgb2312.xml", apppath->str);
+        convd_conv_file(cvd, textfile->str, "C:\\TEMP\\DEBUG\\utf8.xml", 0);
+        cstrbufFree(&textfile);
+        convd_release(&cvd);
     }
     cstrbufFree(&apppath);
 }

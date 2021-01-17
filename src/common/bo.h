@@ -54,7 +54,7 @@
  * @author     Liang Zhang <350137278@qq.com>
  * @version    0.0.9
  * @create     2013-06-19
- * @update     2019-10-29 11:32:50
+ * @update     2021-01-17 21:32:50
  */
 #ifndef BYTE_ORDER_H_INCLUDED
 #define BYTE_ORDER_H_INCLUDED
@@ -110,8 +110,8 @@ static union {
     uint8_t f;
 } __endianess = {{'l','0','0','b'}};
 
-#define __little_endian (((char)__endianess.f) == 'l')
-#define __big_endian (((char)__endianess.f) == 'b')
+#define _host_little_endian (((char)__endianess.f) == 'l')
+#define _host_big_endian (((char)__endianess.f) == 'b')
 
 
 /**
@@ -157,14 +157,47 @@ static union {
 
 __INLINE void BO_swap_bytes(void *value, int size)
 {
-    int i = 0;
+    /* size must be one of: 2, 4, 8 */
+    int i;
     uint8_t t;
     uint8_t *b = (uint8_t*) value;
 
-    for (; i < size/2; ++i) {
+    for (i = 0; i < size/2; ++i) {
         t = b[i];
         b[i] = b[size-i-1];
         b[size-i-1] = t;
+    }
+}
+
+
+__INLINE void BO_bytes_betoh(char *bytes, int size)
+{
+    if (_host_little_endian) {
+        BO_swap_bytes((void*) bytes, size);
+    }    
+}
+
+
+__INLINE void BO_bytes_letoh(char *bytes, int size)
+{
+    if (_host_big_endian) {
+        BO_swap_bytes((void*) bytes, size);
+    }
+}
+
+
+__INLINE void BO_bytes_htobe(void *bytes, int size)
+{
+    if (_host_little_endian) {
+        BO_swap_bytes((void*) bytes, size);
+    }
+}
+
+
+__INLINE void BO_bytes_htole(void *bytes, int size)
+{
+    if (_host_big_endian) {
+        BO_swap_bytes((void*) bytes, size);
     }
 }
 
@@ -174,7 +207,7 @@ __INLINE void BO_swap_bytes(void *value, int size)
  */
 __INLINE int16_t BO_i16_htole (int16_t val)
 {
-    if (__big_endian) {
+    if (_host_big_endian) {
         BO_swap_bytes(&val, sizeof(val));
     }
     return val;
@@ -182,7 +215,7 @@ __INLINE int16_t BO_i16_htole (int16_t val)
 
 __INLINE int16_t BO_i16_htobe (int16_t val)
 {
-    if (__little_endian) {
+    if (_host_little_endian) {
         BO_swap_bytes(&val, sizeof(val));
     }
     return val;
@@ -190,7 +223,7 @@ __INLINE int16_t BO_i16_htobe (int16_t val)
 
 __INLINE int16_t BO_i16_letoh (int16_t val)
 {
-    if (__big_endian) {
+    if (_host_big_endian) {
         BO_swap_bytes(&val, sizeof(val));
     }
     return val;
@@ -198,7 +231,7 @@ __INLINE int16_t BO_i16_letoh (int16_t val)
 
 __INLINE int16_t BO_i16_betoh (int16_t val)
 {
-    if (__little_endian) {
+    if (_host_little_endian) {
         BO_swap_bytes(&val, sizeof(val));
     }
     return val;
@@ -211,7 +244,7 @@ __INLINE int16_t BO_i16_betoh (int16_t val)
  */
 __INLINE int32_t BO_i32_htole (int32_t val)
 {
-    if (__big_endian) {
+    if (_host_big_endian) {
         BO_swap_bytes(&val, sizeof(val));
     }
     return val;
@@ -219,7 +252,7 @@ __INLINE int32_t BO_i32_htole (int32_t val)
 
 __INLINE int32_t BO_i32_htobe (int32_t val)
 {
-    if (__little_endian) {
+    if (_host_little_endian) {
         BO_swap_bytes(&val, sizeof(val));
     }
     return val;
@@ -227,7 +260,7 @@ __INLINE int32_t BO_i32_htobe (int32_t val)
 
 __INLINE int32_t BO_i32_letoh (int32_t val)
 {
-    if (__big_endian) {
+    if (_host_big_endian) {
         BO_swap_bytes(&val, sizeof(val));
     }
     return val;
@@ -235,7 +268,7 @@ __INLINE int32_t BO_i32_letoh (int32_t val)
 
 __INLINE int32_t BO_i32_betoh (int32_t val)
 {
-    if (__little_endian) {
+    if (_host_little_endian) {
         BO_swap_bytes(&val, sizeof(val));
     }
     return val;
@@ -243,7 +276,7 @@ __INLINE int32_t BO_i32_betoh (int32_t val)
 
 __INLINE float BO_f32_htole (float val)
 {
-    if (__big_endian) {
+    if (_host_big_endian) {
         BO_swap_bytes(&val, sizeof(val));
     }
     return val;
@@ -251,7 +284,7 @@ __INLINE float BO_f32_htole (float val)
 
 __INLINE float BO_f32_htobe (float val)
 {
-    if (__little_endian) {
+    if (_host_little_endian) {
         BO_swap_bytes(&val, sizeof(val));
     }
     return val;
@@ -259,7 +292,7 @@ __INLINE float BO_f32_htobe (float val)
 
 __INLINE float BO_f32_letoh (float val)
 {
-    if (__big_endian) {
+    if (_host_big_endian) {
         BO_swap_bytes(&val, sizeof(val));
     }
     return val;
@@ -267,7 +300,7 @@ __INLINE float BO_f32_letoh (float val)
 
 __INLINE float BO_f32_betoh (float val)
 {
-    if (__little_endian) {
+    if (_host_little_endian) {
         BO_swap_bytes(&val, sizeof(val));
     }
     return val;
@@ -278,7 +311,7 @@ __INLINE float BO_f32_betoh (float val)
  */
 __INLINE double BO_f64_htole (double val)
 {
-    if (__big_endian) {
+    if (_host_big_endian) {
         BO_swap_bytes(&val, sizeof(val));
     }
     return val;
@@ -286,7 +319,7 @@ __INLINE double BO_f64_htole (double val)
 
 __INLINE double BO_f64_htobe (double val)
 {
-    if (__little_endian) {
+    if (_host_little_endian) {
         BO_swap_bytes(&val, sizeof(val));
     }
     return val;
@@ -294,7 +327,7 @@ __INLINE double BO_f64_htobe (double val)
 
 __INLINE double BO_f64_letoh (double val)
 {
-    if (__big_endian) {
+    if (_host_big_endian) {
         BO_swap_bytes(&val, sizeof(val));
     }
     return val;
@@ -302,7 +335,7 @@ __INLINE double BO_f64_letoh (double val)
 
 __INLINE double BO_f64_betoh (double val)
 {
-    if (__little_endian) {
+    if (_host_little_endian) {
         BO_swap_bytes(&val, sizeof(val));
     }
     return val;
@@ -310,7 +343,7 @@ __INLINE double BO_f64_betoh (double val)
 
 __INLINE int64_t BO_i64_htole (int64_t val)
 {
-    if (__big_endian) {
+    if (_host_big_endian) {
         BO_swap_bytes(&val, sizeof(val));
     }
     return val;
@@ -318,7 +351,7 @@ __INLINE int64_t BO_i64_htole (int64_t val)
 
 __INLINE int64_t BO_i64_htobe (int64_t val)
 {
-    if (__little_endian) {
+    if (_host_little_endian) {
         BO_swap_bytes(&val, sizeof(val));
     }
     return val;
@@ -326,7 +359,7 @@ __INLINE int64_t BO_i64_htobe (int64_t val)
 
 __INLINE int64_t BO_i64_letoh (int64_t val)
 {
-    if (__big_endian) {
+    if (_host_big_endian) {
         BO_swap_bytes(&val, sizeof(val));
     }
     return val;
@@ -334,7 +367,7 @@ __INLINE int64_t BO_i64_letoh (int64_t val)
 
 __INLINE int64_t BO_i64_betoh (int64_t val)
 {
-    if (__little_endian) {
+    if (_host_little_endian) {
         BO_swap_bytes(&val, sizeof(val));
     }
     return val;
@@ -346,7 +379,7 @@ __INLINE int64_t BO_i64_betoh (int64_t val)
 __INLINE int16_t BO_bytes_betoh_i16 (void *b2)
 {
     int16_t val = *(int16_t*) b2;
-    if (__little_endian) {
+    if (_host_little_endian) {
         val = BO_i16_betoh (val);
     }
     return val;
@@ -355,7 +388,7 @@ __INLINE int16_t BO_bytes_betoh_i16 (void *b2)
 __INLINE int16_t BO_bytes_letoh_i16 (void *b2)
 {
     int16_t val = *(int16_t*) b2;
-    if (__big_endian) {
+    if (_host_big_endian) {
         val = BO_i16_betoh (val);
     }
     return val;
@@ -364,7 +397,7 @@ __INLINE int16_t BO_bytes_letoh_i16 (void *b2)
 __INLINE int32_t BO_bytes_betoh_i32 (void *b4)
 {
     int32_t val = *(int32_t*) b4;
-    if (__little_endian) {
+    if (_host_little_endian) {
         val = BO_i32_betoh (val);
     }
     return val;
@@ -373,7 +406,7 @@ __INLINE int32_t BO_bytes_betoh_i32 (void *b4)
 __INLINE int32_t BO_bytes_letoh_i32 (void *b4)
 {
     int32_t val = *(int32_t*) b4;
-    if (__big_endian) {
+    if (_host_big_endian) {
         val = BO_i32_betoh (val);
     }
     return val;
@@ -382,7 +415,7 @@ __INLINE int32_t BO_bytes_letoh_i32 (void *b4)
 __INLINE float BO_bytes_betoh_f32 (void *b4)
 {
     float val = *(float*) b4;
-    if (__little_endian) {
+    if (_host_little_endian) {
         val = BO_f32_betoh (val);
     }
     return val;
@@ -391,7 +424,7 @@ __INLINE float BO_bytes_betoh_f32 (void *b4)
 __INLINE float BO_bytes_letoh_f32 (void *b4)
 {
     float val = *(float*) b4;
-    if (__big_endian) {
+    if (_host_big_endian) {
         val = BO_f32_betoh (val);
     }
     return val;
@@ -400,7 +433,7 @@ __INLINE float BO_bytes_letoh_f32 (void *b4)
 __INLINE int64_t BO_bytes_betoh_i64 (void *b8)
 {
     int64_t val = *(int64_t*) b8;
-    if (__little_endian) {
+    if (_host_little_endian) {
         val = BO_i64_betoh (val);
     }
     return val;
@@ -409,7 +442,7 @@ __INLINE int64_t BO_bytes_betoh_i64 (void *b8)
 __INLINE int64_t BO_bytes_letoh_i64 (void *b8)
 {
     int64_t val = *(int64_t*) b8;
-    if (__big_endian) {
+    if (_host_big_endian) {
         val = BO_i64_betoh (val);
     }
     return val;
@@ -418,7 +451,7 @@ __INLINE int64_t BO_bytes_letoh_i64 (void *b8)
 __INLINE double BO_bytes_betoh_f64 (void *b8)
 {
     double val = *(double*) b8;
-    if (__little_endian) {
+    if (_host_little_endian) {
         val = BO_f64_betoh (val);
     }
     return val;
@@ -427,7 +460,7 @@ __INLINE double BO_bytes_betoh_f64 (void *b8)
 __INLINE double BO_bytes_letoh_f64 (void *b8)
 {
     double val = *(double*) b8;
-    if (__big_endian) {
+    if (_host_big_endian) {
         val = BO_f64_betoh (val);
     }
     return val;
