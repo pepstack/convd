@@ -37,38 +37,46 @@
 CONVD_UCS_BOM UCS_text_detect_bom(const conv_buf_t *header)
 {
     if (header->blen > 1) {
-        if ((unsigned char)header->bufp[0] == 0xFE &&
-            (unsigned char)header->bufp[1] == 0xFF) {
-            return UCS_UTF_16BE;
+         if ((ub1)header->bufp[0] == 0xFE && (ub1)header->bufp[1] == 0xFF) {
+            return UCS_2BE_BOM;
         }
 
-        if ((unsigned char)header->bufp[0] == 0xFF &&
-            (unsigned char)header->bufp[1] == 0xFE) {
-            return UCS_UTF_16LE;
+        if ((ub1)header->bufp[0] == 0x00 && (ub1)header->bufp[1] == 0x00) {
+            if (header->blen > 3) {
+                if ((ub1)header->bufp[2] == 0xFE && (ub1)header->bufp[3] == 0xFF) {
+                    return UCS_4BE_BOM;
+                }
+            }
         }
 
-        if ((unsigned char)header->bufp[0] == 0xEF &&
-            (unsigned char)header->bufp[1] == 0xBB) {
+        if ((ub1)header->bufp[0] == 0xFF && (ub1)header->bufp[1] == 0xFE) {
+            if (header->blen > 3) {
+                if ((ub1)header->bufp[2] == 0x00 && (ub1)header->bufp[3] == 0x00) {
+                    return UCS_4LE_BOM;
+                }
+            }
+            return UCS_2LE_BOM;
+        }
+
+        if ((ub1)header->bufp[0] == 0xEF && (ub1)header->bufp[1] == 0xBB) {
             if (header->blen == 2) {
                 /* need one more byte */
-                return UCS_UTF_8BOM_ASK;
+                return UCS_UTF8_BOM_ASK;
             }
 
-            if ((unsigned char)header->bufp[2] == 0xBF) {
-                return UCS_UTF_8BOM;
+            if ((ub1)header->bufp[2] == 0xBF) {
+                return UCS_UTF8_BOM;
             }
         }
     }
 
-// TODO: UCS_UTF_32BE UCS_UTF_32LE
-
-    return UCS_BOM_NONE;
+    return UCS_NONE_BOM;
 }
 
 
-CONVDAPI CONVD_UCS_BOM UCS_file_detect_bom(const char *textfile)
+CONVDAPI int UCS_file_detect_bom(const char *textfile, CONVD_UCS_BOM *outbom)
 {
-    int bom = UCS_BOM_NONE;
+    int bom = UCS_NONE_BOM;
 
     filehandle_t hf = file_open_read(textfile);
 
@@ -76,35 +84,74 @@ CONVDAPI CONVD_UCS_BOM UCS_file_detect_bom(const char *textfile)
         conv_buf_t headbuf;
         char header[4] = {0x00, 0x00, 0x00, 0x00};
 
-        /* try to read first 2 bytes */
-        if (file_readbytes(hf, header, 2) == 2) {
-            bom = UCS_text_detect_bom(conv_buf_set(&headbuf, header, 2));
+        /* try to read first 4 bytes */
+        int cb = file_readbytes(hf, header, 4);
 
-            if (bom == UCS_BOM_NONE) {
-                goto finish_done;
-            }
-            if (bom != UCS_UTF_8BOM_ASK) {
-                goto finish_done;
-            }
-            if (file_readbytes(hf, &header[2], 1) == 1) {
-                bom = UCS_text_detect_bom(conv_buf_set(&headbuf, header, 3));
-            }
+        bom = UCS_text_detect_bom(conv_buf_set(&headbuf, header, cb));
+
+        file_close(&hf);
+
+        if (bom == UCS_UTF8_BOM_ASK) {
+            *outbom = UCS_NONE_BOM;
+        } else {
+            *outbom = bom;
         }
+
+        return CONVD_RET_NOERROR;
     }
 
-finish_done:
-    file_close(&hf);
-    return bom;
+    return CONVD_RET_EOPEN;
 }
 
 
 int XML_text_parse_head(const conv_buf_t *xmltext, conv_xmlhead_t *xmlhead, CONVD_UCS_BOM *bomtag)
 {
+    CONVD_UCS_BOM bom = UCS_text_detect_bom(xmltext);
+
+    switch (bom) {
+    case UCS_UTF8_BOM:
+        break;
+
+    case UCS_2BE_BOM:
+        break;
+
+    case UCS_2LE_BOM:
+        break;
+
+    case UCS_4BE_BOM:
+        break;
+
+    case UCS_4LE_BOM:
+        break;
+
+    case UCS_NONE_BOM:
+    default:
+        break;
+    }
+
+    if (bomtag) {
+        *bomtag = bom;
+    }
+
     return 0;
 }
 
 
 int XML_file_parse_head(const char *xmlfile, conv_xmlhead_t *xmlhead, CONVD_UCS_BOM *bomtag)
 {
-    return 0;
+    filehandle_t hf = file_open_read(xmlfile);
+
+    if (hf != filehandle_invalid) {
+        conv_buf_t headbuf;
+        char header[32 + CVD_ENCODING_LEN_MAX];
+
+        /* try to read first 96 bytes */
+        int cbhead = file_readbytes(hf, header, sizeof(header));
+
+        file_close(&hf);
+
+        return XML_text_parse_head(conv_buf_set(&headbuf, header, cbhead), xmlhead, bomtag);
+    }
+
+    return CONVD_RET_EOPEN;
 }

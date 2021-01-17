@@ -131,42 +131,40 @@ void test_textfile()
     }
 
     if (backslash != -1) {
-        int rc;
         cstrbuf textfile;
-        char encoding[CVD_ENCODING_LEN_MAX + 1];
 
         endp += 6;
         *endp = 0;
 
         textfile = cstrbufCat(NULL, "%sucs-2be.txt", apppath->str);
-        bom = UCS_file_detect_bom(textfile->str);
+        UCS_file_detect_bom(textfile->str, &bom);
         printf("bom=%d file=%.*s\n", bom, cstrbufGetLen(textfile), cstrbufGetStr(textfile));
         cstrbufFree(&textfile);
-        assert(bom == UCS_UTF_16BE);
+        assert(bom == UCS_2BE_BOM);
 
         textfile = cstrbufCat(NULL, "%sucs-2le.txt", apppath->str);
-        bom = UCS_file_detect_bom(textfile->str);
+        UCS_file_detect_bom(textfile->str, &bom);
         printf("bom=%d file=%.*s\n", bom, cstrbufGetLen(textfile), cstrbufGetStr(textfile));
         cstrbufFree(&textfile);
-        assert(bom == UCS_UTF_16LE);
+        assert(bom == UCS_2LE_BOM);
 
         textfile = cstrbufCat(NULL, "%sutf-8bom.txt", apppath->str);
-        bom = UCS_file_detect_bom(textfile->str);
+        UCS_file_detect_bom(textfile->str, &bom);
         printf("bom=%d file=%.*s\n", bom, cstrbufGetLen(textfile), cstrbufGetStr(textfile));
         cstrbufFree(&textfile);
-        assert(bom == UCS_UTF_8BOM);
+        assert(bom == UCS_UTF8_BOM);
 
         textfile = cstrbufCat(NULL, "%sutf-8.txt", apppath->str);
-        bom = UCS_file_detect_bom(textfile->str);
+        UCS_file_detect_bom(textfile->str, &bom);
         printf("bom=%d file=%.*s\n", bom, cstrbufGetLen(textfile), cstrbufGetStr(textfile));
         cstrbufFree(&textfile);
-        assert(bom == UCS_BOM_NONE);
+        assert(bom == UCS_NONE_BOM);
 
         textfile = cstrbufCat(NULL, "%sgb2312.txt", apppath->str);
-        bom = UCS_file_detect_bom(textfile->str);
+        UCS_file_detect_bom(textfile->str, &bom);
         printf("bom=%d file=%.*s\n", bom, cstrbufGetLen(textfile), cstrbufGetStr(textfile));
         cstrbufFree(&textfile);
-        assert(bom == UCS_BOM_NONE);
+        assert(bom == UCS_NONE_BOM);
 
        // textfile = cstrbufCat(NULL, "%sutf8bom.xml", apppath->str);
        // rc = encoding_detect_xmlfile(textfile->str, encoding, &bom);

@@ -191,7 +191,7 @@ size_t convd_conv_text(convd_t cvd, conv_buf_t *input, conv_buf_t *output)
 size_t convd_conv_file(convd_t cvd, const char *textfilein, const char *textfileout, CONVD_UCS_BOM outfilebom)
 {
     // TODO:
-    UCS_file_detect_bom(textfilein);
+    //UCS_file_detect_bom(textfilein);
 
     return -1;
 }

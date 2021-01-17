@@ -81,43 +81,43 @@ typedef enum {
     /**
      * Byte Order Mark not found
      */
-    UCS_BOM_NONE     = 0,
+    UCS_NONE_BOM     = 0,
 
     /**
      * UTF-8: 'EF BB BF'
      *   8-bit UCS Transformation Format with BOM header
      */
-    UCS_UTF_8BOM     = 1,
+    UCS_UTF8_BOM     = 1,
 
     /**
      * UTF-16BE: 'FE FF'
      *   16-bit UCS Transformation Format, big-endian byte order
      */
-    UCS_UTF_16BE     = 2,
+    UCS_2BE_BOM     = 2,
 
     /**
      * UTF-16LE: 'FF FE'
      *   16-bit UCS Transformation Format, little-endian byte order
      */
-    UCS_UTF_16LE     = 3,
+    UCS_2LE_BOM     = 3,
 
     /**
      * UTF-32BE: '00 00 FE FF'
      *   32-bit UCS Transformation Format, big-endian byte order
      */
-    UCS_UTF_32BE     = 4,
+    UCS_4BE_BOM     = 4,
 
     /**
      * UTF-32LE: 'FF FE 00 00'
      *   32-bit UCS Transformation Format, little-endian byte order
      */
-    UCS_UTF_32LE     = 5,
+    UCS_4LE_BOM     = 5,
 
     /**
      * UTF-8?: 'EF BB ?'
      *   Ask next one byte to determine if it is UTF_UTF_8BOM
      */
-    UCS_UTF_8BOM_ASK = 6
+    UCS_UTF8_BOM_ASK = 6
 } CONVD_UCS_BOM;
 
 
@@ -276,11 +276,11 @@ CONVDAPI size_t convd_conv_file(convd_t cvd, const char *textfilein, const char 
  *
  * Errors
  *
- *   UCS_BOM_NONE - Faile to detect header.
+ *   UCS_NONE_BOM - Faile to detect header.
  */
 CONVDAPI CONVD_UCS_BOM UCS_text_detect_bom(const conv_buf_t *textbuf);
 
-CONVDAPI CONVD_UCS_BOM UCS_file_detect_bom(const char *pathfile);
+CONVDAPI int UCS_file_detect_bom(const char *pathfile, CONVD_UCS_BOM *outbom);
 
 
 /**
@@ -293,7 +293,7 @@ CONVDAPI CONVD_UCS_BOM UCS_file_detect_bom(const char *pathfile);
  *
  * Errors
  *
- *   UCS_BOM_NONE - Faile to detect header.
+ *   UCS_NONE_BOM - Faile to detect header.
  */
 CONVDAPI int XML_text_parse_head(const conv_buf_t *xmltext, conv_xmlhead_t *xmlhead, CONVD_UCS_BOM *bomtag);
 
