@@ -479,6 +479,14 @@ filehandle_t file_open_read(const char *pathname)
     return hf;
 }
 
+
+NOWARNING_UNUSED(static)
+filehandle_t file_write_new(const char *pathname)
+{
+    return file_create(pathname, GENERIC_WRITE, FILE_ATTRIBUTE_NORMAL);
+}
+
+
 NOWARNING_UNUSED(static)
 int file_close(filehandle_t *phf)
 {
@@ -505,6 +513,20 @@ sb8 file_seek(filehandle_t hf, sb8 distance, int fseekpos)
     if (SetFilePointerEx(hf, li, &li, fseekpos)) {
         return (sb8)li.QuadPart;
     }
+    /* error */
+    return (sb8)(-1);
+}
+
+
+NOWARNING_UNUSED(static)
+sb8 file_size(filehandle_t hf)
+{
+    LARGE_INTEGER li;
+    if (GetFileSizeEx(hf, &li)) {
+        /* success */
+        return (sb8)li.QuadPart;
+    }
+
     /* error */
     return (sb8)(-1);
 }
@@ -608,6 +630,14 @@ filehandle_t file_open_read(const char *pathname)
     int fd = open(pathname, O_RDONLY | O_EXCL, S_IRUSR | S_IRGRP | S_IROTH);
     return fd;
 }
+
+
+NOWARNING_UNUSED(static)
+filehandle_t file_write_new(const char *pathname)
+{
+    return file_create(toxmlfile, O_WRONLY, S_IRUSR|S_IWUSR|S_IRGRP|S_IROTH);
+}
+
 
 NOWARNING_UNUSED(static)
 int file_close(filehandle_t *phf)

@@ -42,7 +42,7 @@ static void convd_cleanup_cb (conv_descriptor_t *cvd)
 }
 
 
-conv_buf_t * conv_buf_set(conv_buf_t *cvbuf, char *arraybytes, size_t numbytes)
+conv_buf_t * convbufMake(conv_buf_t *cvbuf, char *arraybytes, size_t numbytes)
 {
     cvbuf->converr = 0;
     cvbuf->bufp = arraybytes;
@@ -64,7 +64,7 @@ static int ucs_file_read_open(const char *pathfile, convpos_t *_cpos)
         /* try to read first 4 bytes */
         int cb = file_readbytes(hf, header, 4);
 
-        bom = UCS_text_detect_bom(conv_buf_set(&headbuf, header, cb));
+        bom = UCS_text_detect_bom(convbufMake(&headbuf, header, cb));
         if (bom == UCS_UTF8_BOM_ASK) {
             file_close(&hf);
             return CONVD_RET_EENCODING;
@@ -327,14 +327,7 @@ ub8 convd_conv_file(convd_t cvd, const char *textfilein, const char *textfileout
     int ret = ucs_file_read_open(textfilein, &cpos);
 
     if (ret == CONVD_RET_NOERROR) {
-        filehandle_t outfd;
-
-    #if defined(__WINDOWS__)
-        outfd =  file_create(textfileout, GENERIC_WRITE, FILE_ATTRIBUTE_NORMAL);
-    #else
-        /* mode = S_IRUSR|S_IWUSR|S_IRGRP|S_IROTH (0644) */
-        outfd =  file_create(textfileout, O_WRONLY, S_IRUSR|S_IWUSR|S_IRGRP|S_IROTH);
-    #endif
+        filehandle_t outfd = file_write_new(textfileout);
 
         if (outfd != filehandle_invalid) {
             char rdbuf[256];
@@ -368,8 +361,8 @@ ub8 convd_conv_file(convd_t cvd, const char *textfilein, const char *textfileout
                 }
             }
 
-            while ((ret = ucs_file_read_next(cpos, conv_buf_set(&input, rdbuf, sizeof(rdbuf)))) == CONV_CONTINUE) {
-                convcb = convd_conv_text(cvd, &input, conv_buf_set(&output, wrbuf, sizeof(wrbuf)));
+            while ((ret = ucs_file_read_next(cpos, convbufMake(&input, rdbuf, sizeof(rdbuf)))) == CONV_CONTINUE) {
+                convcb = convd_conv_text(cvd, &input, convbufMake(&output, wrbuf, sizeof(wrbuf)));
 
                 if (convcb == CONVD_ERROR_SIZE) {
                     /* error */

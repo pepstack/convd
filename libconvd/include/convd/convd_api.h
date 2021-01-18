@@ -35,6 +35,7 @@ extern "C" {
  * error codes
  */
 #define CONVD_RET_NOERROR    0
+#define CONVD_RET_ERROR    (-1)
 #define CONVD_RET_EICONV   (-1)
 #define CONVD_RET_EOPEN    (-1)
 #define CONVD_RET_EENCODING  1
@@ -122,7 +123,7 @@ typedef enum {
 
 typedef struct
 {
-    int converr;
+    int converr;    // DEL
     size_t blen;
     char *bufp;
 } conv_buf_t;
@@ -177,7 +178,7 @@ typedef struct
                 char outgbk[256];
 
                 for (int i = 0; i < num; i++) {
-                    int outlen = (int) convd_conv_text(cvd, conv_buf_set(&input, intext, strlen(intext)), conv_buf_set(&output, outgbk, sizeof(outgbk)));
+                    int outlen = (int) convd_conv_text(cvd, convbufMake(&input, intext, strlen(intext)), convbufMake(&output, outgbk, sizeof(outgbk)));
 
                     if (i % 20000 == 0) {
                         printf("[%d] outgbk={%.*s}\n", i, outlen, outgbk);
@@ -238,7 +239,7 @@ CONVDAPI const char * convd_tocode(const convd_t cvd);
 CONVDAPI int convd_config(const convd_t cvd, int request, void *argument);
 
 
-CONVDAPI conv_buf_t * conv_buf_set(conv_buf_t *cvbuf, char *arraybytes, size_t numbytes);
+CONVDAPI conv_buf_t * convbufMake(conv_buf_t *cvbuf, char *arraybytes, size_t numbytes);
 
 /**
  * Name
@@ -298,6 +299,10 @@ CONVDAPI int UCS_file_detect_bom(const char *pathfile, CONVD_UCS_BOM *outbom);
 CONVDAPI int XML_text_parse_head(const conv_buf_t *xmltext, conv_xmlhead_t *xmlhead, CONVD_UCS_BOM *bomtag);
 
 CONVDAPI int XML_file_parse_head(const char *xmlfile, conv_xmlhead_t *xmlhead, CONVD_UCS_BOM *bomtag);
+
+CONVDAPI int XML_text_encode(conv_buf_t *xmltextin, conv_buf_t *xmltextout, const char *encoding, CONVD_SUFFIX_MODE suffix);
+
+CONVDAPI int XML_file_encode(const char *xmlfile, const char *toxmlfile, const char *encoding, CONVD_SUFFIX_MODE suffix);
 
 #ifdef __cplusplus
 }

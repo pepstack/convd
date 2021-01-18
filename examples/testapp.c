@@ -29,7 +29,7 @@ static void do_convert(convd_t cvd, int num)
     conv_buf_t input, output;
 
     for (; i < num; i++) {
-        outlen = convd_conv_text(cvd, conv_buf_set(&input, intext, strlen(intext)), conv_buf_set(&output, outgbk, sizeof(outgbk)));
+        outlen = convd_conv_text(cvd, convbufMake(&input, intext, strlen(intext)), convbufMake(&output, outgbk, sizeof(outgbk)));
         if (outlen == CONVD_RET_EICONV) {
             printf("convd_conv_text error(CONVD_RET_EICONV): %s\n", strerror(errno));
             break;
@@ -190,6 +190,13 @@ void test_textfile()
         if (XML_file_parse_head(textfile->str, &xmlhead, NULL) > 0) {
             printf("<?xml version=\"%s\" encoding=\"%s\"?>\n", xmlhead.version, xmlhead.encoding);
         }
+
+        XML_file_encode(textfile->str, "C:\\TEMP\\DEBUG\\utf8out.xml", "UTF-8", 0);
+
+        XML_file_encode("C:\\TEMP\\DEBUG\\utf8out.xml", "C:\\TEMP\\DEBUG\\gbkout.xml", "gb2312", 0);
+
+        XML_file_encode("C:\\TEMP\\DEBUG\\gbkout.xml", "C:\\TEMP\\DEBUG\\utf8out2.xml", "UTF-8", 0);
+
         cstrbufFree(&textfile);
 
         convd_t cvd;
