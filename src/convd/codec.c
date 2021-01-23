@@ -106,11 +106,13 @@ CONVDAPI int UCS_file_detect_bom(const char *textfile, CONVD_UCS_BOM *outbom)
 
 int XML_text_parse_head(const conv_buf_t *xmltext, conv_xmlhead_t *xmlhead, CONVD_UCS_BOM *bomtag)
 {
-    char *start, *end;
+    int flag = 0;
+    size_t offset = 0;
+
+    int headlen = 0;
+    char headbuf[64 + CVD_ENCODING_LEN_MAX];
  
     CONVD_UCS_BOM bom = UCS_text_detect_bom(xmltext);
-
-    size_t offset = 0;
 
     if (bomtag) {
         *bomtag = bom;
@@ -121,49 +123,108 @@ int XML_text_parse_head(const conv_buf_t *xmltext, conv_xmlhead_t *xmlhead, CONV
     switch (bom) {
     case UCS_2BE_BOM:
         offset = 2;
+        while(offset + 1 < xmltext->blen) {
+            if (headlen < sizeof(headbuf) - 1) {
+                headbuf[headlen] = (char) BO_bytes_betoh_i16(&xmltext->bufp[offset]);
+                offset += 2;
+                if (headbuf[headlen++] == '>') {
+                    headbuf[headlen] = '\0';
+                    flag = 1;
+                    break;
+                }
+            }
+        }
         break;
 
     case UCS_2LE_BOM:
         offset = 2;
+        while(offset + 1 < xmltext->blen) {
+            if (headlen < sizeof(headbuf) - 1) {
+                headbuf[headlen] = (char) BO_bytes_letoh_i16(&xmltext->bufp[offset]);
+                offset += 2;
+                if (headbuf[headlen++] == '>') {
+                    headbuf[headlen] = '\0';
+                    flag = 1;
+                    break;
+                }
+            }
+        }
         break;
 
     case UCS_4BE_BOM:
         offset = 4;
+        while(offset + 3 < xmltext->blen) {
+            if (headlen < sizeof(headbuf) - 1) {
+                headbuf[headlen] = (char) BO_bytes_betoh_i32(&xmltext->bufp[offset]);
+                offset += 4;
+                if (headbuf[headlen++] == '>') {
+                    headbuf[headlen] = '\0';
+                    flag = 1;
+                    break;
+                }
+            }
+        }
         break;
 
     case UCS_4LE_BOM:
         offset = 4;
+        while(offset + 3 < xmltext->blen) {
+            if (headlen < sizeof(headbuf) - 1) {
+                headbuf[headlen] = (char) BO_bytes_letoh_i32(&xmltext->bufp[offset]);
+                offset += 4;
+                if (headbuf[headlen++] == '>') {
+                    headbuf[headlen] = '\0';
+                    flag = 1;
+                    break;
+                }
+            }
+        } 
         break;
 
     case UCS_UTF8_BOM:
         offset = 3;
     case UCS_NONE_BOM:
     default:
-        start = strstr(xmltext->bufp + offset, "<?xml ");
-        end = strstr(xmltext->bufp + offset, "?>");
-        if (start && end && start < end) {
-            char * ver = strstr(start, " version=\"");
-            if (ver && ver > start && ver < end) {
-                char *vend = strstr(&ver[10], "\"");
-                if (vend && vend < end) {
-                    strncpy(xmlhead->version, &ver[10], vend - ver - 10);
+        while(offset < xmltext->blen) {
+            if (headlen < sizeof(headbuf) - 1) {
+                headbuf[headlen] = xmltext->bufp[offset++];
+                if (headbuf[headlen++] == '>') {
+                    headbuf[headlen] = '\0';
+                    flag = 1;
+                    break;
                 }
             }
-
-            char * enc = strstr(start, " encoding=\"");
-            if (enc) {
-                char *vend = strstr(&enc[11], "\"");
-                if (vend && vend < end) {
-                    strncpy(xmlhead->encoding, &enc[11], vend - enc - 11);
-                }
-            }
-            return (int)(offset + (int)(end - start) + 2);
         }
         break;
     }
 
+    if (flag && headlen > 20 && cstr_startwith(headbuf, headlen, "<?xml ", 6) &&
+        headbuf[headlen-2] == '?' && headbuf[headlen-1] == '>') {
+        char *s, *end;
+
+        s = strstr(headbuf, "version=\"");
+        if (s) {
+            end = strstr(s + 9, "\"");
+            if (end && (int)(end - s) < 4) {
+                strncpy(xmlhead->version, s + 9, (end - s));
+                xmlhead->encoding[sizeof(xmlhead->version) - 1] = 0;
+            }
+
+            s = strstr(headbuf, "encoding=\"");
+            if (s) {
+                end = strstr(s + 10, "\"");
+                if (end && (int)(end - s) > 0 && (end - s) < sizeof(xmlhead->encoding)) {
+                    strncpy(xmlhead->encoding, s + 10, (end - s));
+                    xmlhead->encoding[sizeof(xmlhead->encoding) - 1] = 0;
+                }
+            }
+
+            return offset;
+        }
+    }
+
     /* xml head not found */
-    return 0;
+    return (-1);
 }
 
 
@@ -186,12 +247,36 @@ int XML_file_parse_head(const char *xmlfile, conv_xmlhead_t *xmlhead, CONVD_UCS_
     return CONVD_RET_EOPEN;
 }
 
-
+// TODO:
 int XML_text_encode(conv_buf_t *xmltextin, conv_buf_t *xmltextout, const char *encoding, CONVD_SUFFIX_MODE suffix)
 {
     conv_xmlhead_t xmlhead;
-    int len = XML_text_parse_head(xmltextin, &xmlhead, NULL);
-    if (len > 0) {
+    int bodyat = XML_text_parse_head(xmltextin, &xmlhead, NULL);
+    if (bodyat > 0) {
+        convd_t cvd;
+        int ret = convd_create(xmlhead.encoding, "UTF-8", suffix, &cvd);
+
+        cstrbuf utf8buf = cstrbufNew(xmltextin->blen * 4, NULL, 0);
+        conv_buf_t cvbin, cvbout;
+
+        utf8buf->len = (int) convd_conv_text(cvd, xmltextin, convbufMake(&cvbout, utf8buf->str, utf8buf->maxsz));
+
+        bodyat = XML_text_parse_head(convbufMake(&cvbout, utf8buf->str, utf8buf->len), &xmlhead, NULL);
+
+        if (stricmp(encoding, "UTF-8")) {
+            convd_t cvd2;
+            convd_create("UTF-8", encoding, suffix, &cvd2);
+
+            cstrbuf outbuf = cstrbufNew(utf8buf->len * 4, NULL, 0);
+
+            outbuf->len = convd_conv_text(cvd2,
+                convbufMake(&cvbin, &utf8buf->str[bodyat], utf8buf->len - bodyat),
+                convbufMake(&cvbout, outbuf->str, outbuf->maxsz));
+
+            
+        }
+    }
+/*
         convd_t cvd;
         conv_buf_t cvbin, cvbout;
 
@@ -212,7 +297,6 @@ int XML_text_encode(conv_buf_t *xmltextin, conv_buf_t *xmltextout, const char *e
                     convd_release(&cvd);
 
                     if (len != -1) {
-                        /* success */
                         xmltextout->blen = headbuflen + len;
                         return (int) xmltextout->blen;
                     }
@@ -221,7 +305,8 @@ int XML_text_encode(conv_buf_t *xmltextin, conv_buf_t *xmltextout, const char *e
         }
     }
 
-    return (-1);
+    
+*/return (-1);
 }
 
 
@@ -231,7 +316,10 @@ int XML_file_encode(const char *xmlfile, const char *toxmlfile, const char *enco
 
     if (hf != filehandle_invalid) {
         sb8 sz = file_size(hf);
-        assert(sz*4 <= cstr_length_maximum);
+        if (sz > cstr_length_maximum / 4) {
+            file_close(&hf);
+            return (-1);
+        }
 
         cstrbuf inbuf = cstrbufNew((ub4)sz, 0, 0);
         cstrbuf outbuf = cstrbufNew((ub4)sz*4, 0, 0);

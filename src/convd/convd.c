@@ -51,7 +51,7 @@ conv_buf_t * convbufMake(conv_buf_t *cvbuf, char *arraybytes, size_t numbytes)
 }
 
 
-static int ucs_file_read_open(const char *pathfile, convpos_t *_cpos)
+static int ucs_file_read_open(const char * encode, const char *pathfile, convpos_t *_cpos)
 {
     filehandle_t hf = file_open_read(pathfile);
     if (hf != filehandle_invalid) {
@@ -80,6 +80,12 @@ static int ucs_file_read_open(const char *pathfile, convpos_t *_cpos)
             cb = 3;
         }
 
+        sb8 totalsize = (sb8) file_size(hf);
+        if (totalsize > cstr_length_maximum / 4) {
+            file_close(&hf);
+            return CONVD_RET_EOVERFLOW;
+        }
+
         if (file_seek(hf, cb, 0) != cb) {
             file_close(&hf);
             return CONVD_RET_EOPEN;
@@ -88,7 +94,9 @@ static int ucs_file_read_open(const char *pathfile, convpos_t *_cpos)
         cpos = (convpos_t)mem_alloc_unset(sizeof(conv_position_t));
         cpos->bom = bom;
         cpos->offset = cb;
+        cpos->totalsize = (ub4) totalsize;
         cpos->textfd = hf;
+        strncpy(cpos->encode, encode, strnlen(encode, sizeof(cpos->encode) - 1));
 
         *_cpos= cpos;
         return CONVD_RET_NOERROR;
@@ -102,65 +110,6 @@ static void ucs_file_read_close(convpos_t cpos)
 {
     file_close(&cpos->textfd);
     mem_free(cpos);
-}
-
-
-static int ucs_file_read_next(convpos_t cpos, conv_buf_t *rdbuf)
-{
-    int offcb = 0;
-    int rdlen = file_readbytes(cpos->textfd, rdbuf->bufp, (ub4)rdbuf->blen);
-    if (rdlen == -1) {
-        return CONV_EBREAK;
-    }
-    if (rdlen == 0) {
-        return CONV_FINISHED;
-    }
-
-    switch (cpos->bom) {
-    case UCS_2BE_BOM:
-        while (offcb <= rdlen - 2) {
-            BO_bytes_betoh(rdbuf->bufp + offcb, 2);
-            offcb += 2;
-        }
-        break;
-
-    case UCS_2LE_BOM:
-        while (offcb <= rdlen - 2) {
-            BO_bytes_letoh(rdbuf->bufp + offcb, 2);
-            offcb += 2;
-        }
-        break;
-
-    case UCS_4BE_BOM:
-        while (offcb <= rdlen - 4) {
-            BO_bytes_betoh(rdbuf->bufp + offcb, 4);
-            offcb += 4;
-        }
-        break;
-
-    case UCS_4LE_BOM:
-        while (offcb <= rdlen - 4) {
-            BO_bytes_letoh(rdbuf->bufp + offcb, 4);
-            offcb += 4;
-        }
-        break;
-
-    case UCS_UTF8_BOM:
-    case UCS_NONE_BOM:
-    default:
-        /* TODO: run-length encoding */
-        offcb = rdlen;
-        break;
-    }
-
-    cpos->offset += offcb;
-
-    if (file_seek(cpos->textfd, cpos->offset, fseek_pos_set) != cpos->offset) {
-        return CONV_EBREAK;
-    }
-
-    rdbuf->blen = offcb;
-    return CONV_CONTINUE;
 }
 
 
@@ -320,79 +269,46 @@ size_t convd_conv_text(convd_t cvd, conv_buf_t *input, conv_buf_t *output)
 }
 
 
-ub8 convd_conv_file(convd_t cvd, const char *textfilein, const char *textfileout, CONVD_UCS_BOM outbomhead)
+/**
+ *   https://worthsen.blog.csdn.net/article/details/86585271
+ */
+ub8 convd_conv_file(convd_t cvd, const char *textfilein, const char *textfileout, int addbom)
 {
     convpos_t cpos;
 
-    int ret = ucs_file_read_open(textfilein, &cpos);
+    int ret = ucs_file_read_open(convd_fromcode(cvd), textfilein, &cpos);
 
     if (ret == CONVD_RET_NOERROR) {
         filehandle_t outfd = file_write_new(textfileout);
 
         if (outfd != filehandle_invalid) {
-            char rdbuf[256];
-            char wrbuf[4096];
+            cstrbuf rdbuf = cstrbufNew(cpos->totalsize, NULL, 0);
+            cstrbuf wrbuf = cstrbufNew(cpos->totalsize * 4, NULL, 0);
 
             conv_buf_t input;
             conv_buf_t output;
 
-            size_t convcb;
+            rdbuf->len = (ub4) file_readbytes(cpos->textfd, rdbuf->str, (ub4)rdbuf->maxsz);
+            wrbuf->len = (ub4) convd_conv_text(cvd, convbufMake(&input, rdbuf->str, rdbuf->len), convbufMake(&output, wrbuf->str, wrbuf->maxsz));
 
-            sb8 outfilesize = 0;
-
-            if (outbomhead) {
-                if (outbomhead == UCS_UTF8_BOM) {
-                    wrbuf[0] = 0xEF; wrbuf[1] = 0xBB; wrbuf[2] = 0xBF;
-                    outfilesize = file_writebytes(outfd, wrbuf, 3);
-                } else if (outbomhead == UCS_2BE_BOM) {
-                    wrbuf[0] = 0xFE; wrbuf[1] = 0xFF;
-                    outfilesize = file_writebytes(outfd, wrbuf, 2);
-                } else if (outbomhead == UCS_2LE_BOM) {
-                    wrbuf[0] = 0xFF; wrbuf[1] = 0xFE;
-                    outfilesize = file_writebytes(outfd, wrbuf, 2);
-                } else if (outbomhead == UCS_4BE_BOM) {
-                    wrbuf[0] = 0x00; wrbuf[1] = 0x00;
-                    wrbuf[2] = 0xFE; wrbuf[3] = 0xFF;
-                    outfilesize = file_writebytes(outfd, wrbuf, 4);
-                } else if (outbomhead == UCS_4LE_BOM) {
-                    wrbuf[0] = 0xFF; wrbuf[1] = 0xFE;
-                    wrbuf[2] = 0x00; wrbuf[3] = 0x00;
-                    outfilesize = file_writebytes(outfd, wrbuf, 4);
-                }
+            if (file_writebytes(outfd, wrbuf->str, wrbuf->len) == -1) {
+                /* error */
+                file_close(&outfd);
+                ucs_file_read_close(cpos);
+                cstrbufFree(&rdbuf);
+                cstrbufFree(&wrbuf);
+                return (ub8) CONVD_ERROR_SIZE;
             }
 
-            while ((ret = ucs_file_read_next(cpos, convbufMake(&input, rdbuf, sizeof(rdbuf)))) == CONV_CONTINUE) {
-                convcb = convd_conv_text(cvd, &input, convbufMake(&output, wrbuf, sizeof(wrbuf)));
+            /* success */
+            ub8 outfdsz = (ub8)wrbuf->len;
 
-                if (convcb == CONVD_ERROR_SIZE) {
-                    /* error */
-                    file_close(&outfd);
-                    ucs_file_read_close(cpos);
-                    return (ub8) CONVD_ERROR_SIZE;
-                }
-
-                if (file_writebytes(outfd, wrbuf, (ub4)convcb) == -1) {
-                    /* error */
-                    file_close(&outfd);
-                    ucs_file_read_close(cpos);
-                    return (ub8) CONVD_ERROR_SIZE;
-                }
-
-                if (input.blen) {
-                    cpos->offset = file_seek(cpos->textfd, cpos->offset - input.blen, fseek_pos_set);
-                }
-
-                outfilesize += convcb;
-            }
-
+            cstrbufFree(&rdbuf);
+            cstrbufFree(&wrbuf);
             file_close(&outfd);
             ucs_file_read_close(cpos);
 
-            if (ret == CONV_FINISHED) {
-                return (ub8) outfilesize;
-            } else {
-                return (ub8) CONVD_ERROR_SIZE;
-            }
+            return outfdsz;
         }
 
         ucs_file_read_close(cpos);

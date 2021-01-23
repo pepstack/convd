@@ -10,24 +10,24 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="..\..\examples\testapp.c">
+    <ClCompile Include="..\..\codeconv\codeconv.c">
       <Filter>src</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\examples\win32\getopt_longw.c">
+    <ClCompile Include="..\..\codeconv\win32\getopt_longw.c">
       <Filter>src\win32</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\examples\win32\getoptw.c">
+    <ClCompile Include="..\..\codeconv\win32\getoptw.c">
       <Filter>src\win32</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="..\..\examples\app_incl.h">
+    <ClInclude Include="..\..\codeconv\app_incl.h">
       <Filter>src</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\examples\win32\getopt_intw.h">
+    <ClInclude Include="..\..\codeconv\win32\getopt_intw.h">
       <Filter>src\win32</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\examples\win32\getoptw.h">
+    <ClInclude Include="..\..\codeconv\win32\getoptw.h">
       <Filter>src\win32</Filter>
     </ClInclude>
   </ItemGroup>

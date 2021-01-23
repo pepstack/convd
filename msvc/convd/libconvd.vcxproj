@@ -227,12 +227,23 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\src\common\win32\syslog-client.c" />
-    <ClCompile Include="..\..\src\convd\convd.c" />
     <ClCompile Include="..\..\src\convd\codec.c" />
+    <ClCompile Include="..\..\src\convd\convd.c" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="..\..\src\convd\convd_i.h" />
+    <ClInclude Include="..\..\src\common\bo.h" />
+    <ClInclude Include="..\..\src\common\cstrbuf.h" />
+    <ClInclude Include="..\..\src\common\emerglog.h" />
+    <ClInclude Include="..\..\src\common\memapi.h" />
+    <ClInclude Include="..\..\src\common\memord.h" />
+    <ClInclude Include="..\..\src\common\misc.h" />
+    <ClInclude Include="..\..\src\common\mscrtdbg.h" />
+    <ClInclude Include="..\..\src\common\refcobject.h" />
+    <ClInclude Include="..\..\src\common\thread_rwlock.h" />
+    <ClInclude Include="..\..\src\common\uatomic.h" />
+    <ClInclude Include="..\..\src\common\unitypes.h" />
     <ClInclude Include="..\..\src\convd\convd_api.h" />
+    <ClInclude Include="..\..\src\convd\convd_i.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

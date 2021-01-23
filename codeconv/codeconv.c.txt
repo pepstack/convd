@@ -1,5 +1,5 @@
 /**
- * @filename   testapp.c
+ * @filename   codeconv.c
  *   sample application shows how to use libconvd.
  *   字符集转换例子
  *

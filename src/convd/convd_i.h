@@ -27,7 +27,6 @@ extern "C" {
 #include "convd_api.h"
 
 #define CONVD_ERROR_ICONV    ((iconv_t)(-1))
-
 #define CONVD_ERROR_SIZE     ((size_t)(-1))
 
 #define CONV_CONTINUE       1
@@ -38,7 +37,6 @@ extern "C" {
 typedef struct _conv_descriptor_t
 {
     iconv_t cd;
-
     int tocodeat;
     char codebuf[0];
 } conv_descriptor_t;
@@ -49,6 +47,8 @@ typedef struct _conv_position_t
     filehandle_t textfd;
     CONVD_UCS_BOM bom;
     sb8 offset;
+    ub4 totalsize;
+    char encode[CVD_ENCODING_LEN_MAX];
 } conv_position_t, *convpos_t;
 
 

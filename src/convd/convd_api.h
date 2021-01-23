@@ -40,6 +40,7 @@ extern "C" {
 #define CONVD_RET_EOPEN    (-1)
 #define CONVD_RET_EENCODING  1
 #define CONVD_RET_ESUFFIX    2
+#define CONVD_RET_EOVERFLOW  3
 
 typedef struct _conv_descriptor_t    *convd_t;
 
@@ -260,11 +261,7 @@ CONVDAPI conv_buf_t * convbufMake(conv_buf_t *cvbuf, char *arraybytes, size_t nu
  */
 CONVDAPI size_t convd_conv_text(convd_t cvd, conv_buf_t *input, conv_buf_t *output);
 
-/**
- * TODO:
- *   https://worthsen.blog.csdn.net/article/details/86585271
- */
-CONVDAPI ub8 convd_conv_file(convd_t cvd, const char *textfilein, const char *textfileout, CONVD_UCS_BOM outfilebom);
+CONVDAPI ub8 convd_conv_file(convd_t cvd, const char *textfilein, const char *textfileout, int addbom);
 
 
 /**

@@ -3,7 +3,7 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 14
 VisualStudioVersion = 14.0.25420.1
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "testapp", "test\testapp.vcxproj", "{C1B83E25-C103-4BD3-9A79-B233B555A3F5}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "codeconv", "codeconv\codeconv.vcxproj", "{C1B83E25-C103-4BD3-9A79-B233B555A3F5}"
 	ProjectSection(ProjectDependencies) = postProject
 		{46732180-D6C6-48B2-8036-FB0A9BB876BA} = {46732180-D6C6-48B2-8036-FB0A9BB876BA}
 	EndProjectSection

@@ -19,21 +19,21 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="..\..\examples\testapp.c" />
-    <ClCompile Include="..\..\examples\win32\getoptw.c" />
-    <ClCompile Include="..\..\examples\win32\getopt_longw.c" />
+    <ClCompile Include="..\..\codeconv\codeconv.c" />
+    <ClCompile Include="..\..\codeconv\win32\getoptw.c" />
+    <ClCompile Include="..\..\codeconv\win32\getopt_longw.c" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="..\..\examples\app_incl.h" />
-    <ClInclude Include="..\..\examples\win32\getoptw.h" />
-    <ClInclude Include="..\..\examples\win32\getopt_intw.h" />
+    <ClInclude Include="..\..\codeconv\app_incl.h" />
+    <ClInclude Include="..\..\codeconv\win32\getoptw.h" />
+    <ClInclude Include="..\..\codeconv\win32\getopt_intw.h" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <ProjectGuid>{C1B83E25-C103-4BD3-9A79-B233B555A3F5}</ProjectGuid>
     <Keyword>Win32Proj</Keyword>
     <RootNamespace>logapp</RootNamespace>
     <WindowsTargetPlatformVersion>8.1</WindowsTargetPlatformVersion>
-    <ProjectName>testapp</ProjectName>
+    <ProjectName>codeconv</ProjectName>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
