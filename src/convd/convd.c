@@ -44,14 +44,13 @@ static void convd_cleanup_cb (conv_descriptor_t *cvd)
 
 conv_buf_t * convbufMake(conv_buf_t *cvbuf, char *arraybytes, size_t numbytes)
 {
-    cvbuf->converr = 0;
     cvbuf->bufp = arraybytes;
     cvbuf->blen = numbytes;
     return cvbuf;
 }
 
 
-static int ucs_file_read_open(const char * encode, const char *pathfile, convpos_t *_cpos)
+static int ucs_file_read_open(convd_t cvd, const char *pathfile, ub4 linesizemax, convpos_t *_cpos)
 {
     filehandle_t hf = file_open_read(pathfile);
     if (hf != filehandle_invalid) {
@@ -62,47 +61,119 @@ static int ucs_file_read_open(const char * encode, const char *pathfile, convpos
         char header[4] = {0x00, 0x00, 0x00, 0x00};
 
         /* try to read first 4 bytes */
-        int cb = file_readbytes(hf, header, 4);
-
-        bom = UCS_text_detect_bom(convbufMake(&headbuf, header, cb));
+        int offcb = file_readbytes(hf, header, 4);
+        bom = UCS_text_detect_bom(convbufMake(&headbuf, header, offcb));
         if (bom == UCS_UTF8_BOM_ASK) {
             file_close(&hf);
             return CONVD_RET_EENCODING;
         }
 
-        cb = 0;
-
+        offcb = 0;
         if (bom == UCS_2BE_BOM || bom == UCS_2LE_BOM) {
-            cb = 2;
+            offcb = 2;
         } else if (bom == UCS_4BE_BOM || bom == UCS_4LE_BOM) {
-            cb = 4;
+            offcb = 4;
         } else if (bom == UCS_UTF8_BOM) {
-            cb = 3;
+            offcb = 3;
         }
-
-        sb8 totalsize = (sb8) file_size(hf);
-        if (totalsize > cstr_length_maximum / 4) {
-            file_close(&hf);
-            return CONVD_RET_EOVERFLOW;
-        }
-
-        if (file_seek(hf, cb, 0) != cb) {
+        if (file_seek(hf, offcb, 0) != offcb) {
             file_close(&hf);
             return CONVD_RET_EOPEN;
         }
 
-        cpos = (convpos_t)mem_alloc_unset(sizeof(conv_position_t));
+        if (linesizemax == -1) {
+             linesizemax = CONV_LINE_MAXSIZE;
+        }
+
+        cpos = (convpos_t)mem_alloc_unset(sizeof(conv_position_t) + (5 * linesizemax) * sizeof(char));
+
+        cpos->cvd = cvd;
         cpos->bom = bom;
-        cpos->offset = cb;
-        cpos->totalsize = (ub4) totalsize;
+        cpos->offset = offcb;
         cpos->textfd = hf;
-        strncpy(cpos->encode, encode, strnlen(encode, sizeof(cpos->encode) - 1));
+        cpos->linesize = linesizemax;
+        cpos->inputbuf = cpos->linebuf;
+        cpos->outputbuf = &cpos->linebuf[cpos->linesize];
 
         *_cpos= cpos;
         return CONVD_RET_NOERROR;
     }
 
     return CONVD_RET_EOPEN;
+}
+
+
+static int ucs_file_read_next(convpos_t cpos)
+{
+    ub1 chbyte;
+    int bitflag;
+    int offcb = 0;
+    int rdlen = file_readbytes(cpos->textfd, cpos->inputbuf, cpos->linesize);
+    if (rdlen == -1) {
+        return CONV_EBREAK;
+    }
+    if (rdlen == 0) {
+        return CONV_FINISHED;
+    }
+
+    switch (cpos->bom) {
+    case UCS_2BE_BOM:
+        while (offcb <= rdlen - 2) {
+            BO_bytes_betoh(cpos->inputbuf + offcb, 2);
+            offcb += 2;
+        }
+        break;
+
+    case UCS_2LE_BOM:
+        while (offcb <= rdlen - 2) {
+            BO_bytes_letoh(cpos->inputbuf + offcb, 2);
+            offcb += 2;
+        }
+        break;
+
+    case UCS_4BE_BOM:
+        while (offcb <= rdlen - 4) {
+            BO_bytes_betoh(cpos->inputbuf + offcb, 4);
+            offcb += 4;
+        }
+        break;
+
+    case UCS_4LE_BOM:
+        while (offcb <= rdlen - 4) {
+            BO_bytes_letoh(cpos->inputbuf + offcb, 4);
+            offcb += 4;
+        }
+        break;
+
+    case UCS_UTF8_BOM:
+    case UCS_NONE_BOM:
+    default:
+        /* 读到换行符(\n), ascii字符和非ascii字符集转换处结束. 包括换行符. 如果遇到(\r\n), 去掉(\r) */
+        chbyte = cpos->inputbuf[offcb++];
+        bitflag = BO_check_bit(chbyte, 7);
+        while (offcb < rdlen) {
+            chbyte = cpos->inputbuf[offcb];
+            if ((int)BO_check_bit(chbyte, 7) != bitflag) {
+                /* 字符集转换处结束 */
+                break;
+            }
+            offcb++;
+        }
+
+        if (offcb == cpos->linesize) {
+            /* insufficent buf size for line */
+            return CONV_EINSUF;
+        }
+        break;
+    }
+
+    cpos->offset += offcb;
+
+    if (file_seek(cpos->textfd, cpos->offset, fseek_pos_set) != cpos->offset) {
+        return CONV_EBREAK;
+    }
+
+    return offcb;
 }
 
 
@@ -229,91 +300,169 @@ size_t convd_conv_text(convd_t cvd, conv_buf_t *input, conv_buf_t *output)
 
     ret = iconv(cvd->cd, NULL, NULL, NULL, NULL);
     if (ret == CONVD_ERROR_SIZE) {
-        output->converr = errno;
-
         refc_object_unlock(cvd);
-        return CONVD_RET_EICONV;
+        return (-1);
     }
 
     outlen = output->blen;
-
     for (;;) {
         ret = iconv(cvd->cd, &input->bufp, &input->blen, &output->bufp, &output->blen);
-
         if (ret == CONVD_ERROR_SIZE) {
-            // unexpected error
-            output->converr = errno;
             refc_object_unlock(cvd);
-            return CONVD_RET_EICONV;
+            return (-1);
         }
 
         if (input->blen == 0) {
-            output->converr = 0;
             refc_object_unlock(cvd);
 
-            // success( >=0 ): all input converted ok
+            /* success( >=0 ): all input converted ok */
             return (outlen - output->blen);
         }
     }
 
-    output->converr = errno;
     refc_object_unlock(cvd);
-
-    if (output->converr == EINVAL) {
-        // part converted (input->blen > 0)
-        return (outlen - output->blen);
-    }
-
-    // unexpected error
-    return CONVD_RET_EICONV;
+    return (-1);
 }
 
 
 /**
  *   https://worthsen.blog.csdn.net/article/details/86585271
  */
-ub8 convd_conv_file(convd_t cvd, const char *textfilein, const char *textfileout, int addbom)
+int convd_conv_file(convd_t cvd, const char *textfilein, size_t inoffset, const char *textfileout, const char *outhead, size_t outheadlen, ub4 linesizemax, ub8 *outfilesize, int addbom)
 {
     convpos_t cpos;
+    ub8 outfdsize = 0;
 
-    int ret = ucs_file_read_open(convd_fromcode(cvd), textfilein, &cpos);
-
+    int ret = ucs_file_read_open(cvd, textfilein, linesizemax, &cpos);
     if (ret == CONVD_RET_NOERROR) {
         filehandle_t outfd = file_write_new(textfileout);
-
         if (outfd != filehandle_invalid) {
-            cstrbuf rdbuf = cstrbufNew(cpos->totalsize, NULL, 0);
-            cstrbuf wrbuf = cstrbufNew(cpos->totalsize * 4, NULL, 0);
+            conv_buf_t input, output;
 
-            conv_buf_t input;
-            conv_buf_t output;
+            if (outhead && outheadlen) {
+                if (file_writebytes(outfd, outhead, (ub4)outheadlen) == -1) {
+                    /* error */
+                    file_close(&outfd);
+                    ucs_file_read_close(cpos);
+                    return (-1);
+                }
+            }            
 
-            rdbuf->len = (ub4) file_readbytes(cpos->textfd, rdbuf->str, (ub4)rdbuf->maxsz);
-            wrbuf->len = (ub4) convd_conv_text(cvd, convbufMake(&input, rdbuf->str, rdbuf->len), convbufMake(&output, wrbuf->str, wrbuf->maxsz));
+            cpos->offset += inoffset;
+            file_seek(cpos->textfd, inoffset, fseek_pos_cur);
 
-            if (file_writebytes(outfd, wrbuf->str, wrbuf->len) == -1) {
-                /* error */
-                file_close(&outfd);
-                ucs_file_read_close(cpos);
-                cstrbufFree(&rdbuf);
-                cstrbufFree(&wrbuf);
-                return (ub8) CONVD_ERROR_SIZE;
+            while ((ret = ucs_file_read_next(cpos)) > 0) {
+                size_t convcb = convd_conv_text(cvd, convbufMake(&input, cpos->inputbuf, ret), convbufMake(&output, cpos->outputbuf, cpos->linesize * 4));
+                if (convcb == CONVD_ERROR_SIZE) {
+                    /* error */
+                    file_close(&outfd);
+                    ucs_file_read_close(cpos);
+                    return (-1);
+                }
+
+                if (file_writebytes(outfd, cpos->outputbuf, (ub4)convcb) == -1) {
+                    /* error */
+                    file_close(&outfd);
+                    ucs_file_read_close(cpos);
+                    return (-1);
+                }
+
+                outfdsize += convcb;
             }
 
-            /* success */
-            ub8 outfdsz = (ub8)wrbuf->len;
-
-            cstrbufFree(&rdbuf);
-            cstrbufFree(&wrbuf);
             file_close(&outfd);
             ucs_file_read_close(cpos);
 
-            return outfdsz;
+            if (ret == CONV_FINISHED) {
+                /* success returns 0 */
+                if (outfilesize) {
+                    *outfilesize = outfdsize;
+                }
+            }
+            return ret;
         }
-
         ucs_file_read_close(cpos);
     }
-
-    return (ub8) CONVD_ERROR_SIZE;
+    return ret;
 }
 
+
+size_t convd_conv_xmltext(convd_t cvd, conv_buf_t *input, conv_buf_t *output)
+{
+    conv_xmlhead_t xmlhead;
+    conv_buf_t inbuf, outbuf;
+
+    size_t convsize = 0;
+    int offslen = 0;
+
+    int xmlheadlen = XML_text_parse_head(convbufMake(&inbuf, input->bufp, input->blen), &xmlhead);
+
+    if (stricmp(convd_fromcode(cvd), xmlhead.encoding)) {
+        return -1;
+    }
+
+    if (! memcmp(convd_tocode(cvd), "UTF-8", 5) ||
+        ! memcmp(convd_tocode(cvd), "GB2312", 6) ||
+        ! memcmp(convd_tocode(cvd), "BIG5", 4) ||
+        ! memcmp(convd_tocode(cvd), "GBK", 3) ||
+        ! memcmp(convd_tocode(cvd), "GB18030", 7)) {
+        // ansi == utf8
+        xmlhead.bom = 0;
+        cstr_safecopy(xmlhead.encoding, sizeof(xmlhead.encoding), 0, convd_tocode(cvd), cstr_length(convd_tocode(cvd), sizeof(xmlhead.encoding) - 1));
+
+        offslen = conv_xmlhead_format(&xmlhead, convbufMake(&outbuf, output->bufp, output->blen));
+    } else {
+
+        // TODO:
+        // utf8 -> tocode
+    }
+
+    convsize = convd_conv_text(cvd,
+                    convbufMake(&inbuf, &input->bufp[xmlheadlen], input->blen - xmlheadlen),
+                    convbufMake(&outbuf, &output->bufp[offslen], output->blen - offslen));
+    if (convsize == -1) {
+        return -1;
+    }
+
+    return convsize + (size_t) offslen;
+}
+
+
+int convd_conv_xmlfile(convd_t cvd, const char *xmlfilein, const char *xmlfileout, ub4 linesizemax, ub8 *outfilesize, int addbom)
+{
+    char xmlheadbuf[CVD_ENCODING_LEN_MAX + 16 + 32];
+    int xmlheadlen = 0;
+
+    conv_xmlhead_t xmlhead;
+    int headofflen = XML_file_parse_head(xmlfilein, &xmlhead);
+    if (headofflen > 0) {
+        if (! memcmp(convd_tocode(cvd), "UTF-8", 5) ||
+            ! memcmp(convd_tocode(cvd), "GB2312", 6) ||
+            ! memcmp(convd_tocode(cvd), "BIG5", 4) ||
+            ! memcmp(convd_tocode(cvd), "GBK", 3) ||
+            ! memcmp(convd_tocode(cvd), "GB18030", 7)) {
+            conv_buf_t output;
+
+            const char *tocode = convd_tocode(cvd);
+            int tocodelen = cstr_length(tocode, -1);
+            char *end = strstr(tocode, "//");
+            if (end) {
+                tocodelen = (int)(end - tocode);
+            }
+
+            // ansi == utf8
+            xmlhead.bom = 0;
+            if (! cstr_safecopy(xmlhead.encoding, sizeof(xmlhead.encoding), 0, tocode, tocodelen)) {
+                return -1;
+            }
+            xmlheadlen = conv_xmlhead_format(&xmlhead, convbufMake(&output, xmlheadbuf, sizeof(xmlheadbuf)));
+        } else {
+            // TODO:
+            // utf8 -> tocode
+        }
+
+        return convd_conv_file(cvd, xmlfilein, headofflen, xmlfileout, xmlheadbuf, xmlheadlen, linesizemax, outfilesize, addbom);
+    }
+
+    return -1;
+}

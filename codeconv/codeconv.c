@@ -18,7 +18,7 @@ int main (int argc, char *argv[])
     WINDOWS_CRTDBG_ON
 
     int ret;
-    ub8 outsz;
+
     convd_t cvd;
 
     parse_arguments(argc, argv);
@@ -62,10 +62,18 @@ int main (int argc, char *argv[])
         exit(-1);
     }
 
-    outsz = convd_conv_file(cvd, input_file->str, output_file->str, add_bom);
-    if (outsz == (ub8)(-1)) {
-        printf("[ERROR] convd_conv_file error.\n");
-        exit(-1);
+    if (cstr_endwith(input_file->str, input_file->len, ".xml", 4)) {
+        ret = convd_conv_xmlfile(cvd, input_file->str, output_file->str, 1024, NULL, add_bom);
+        if (ret != 0) {
+            printf("[ERROR] convd_conv_xmlfile error(%d).\n", ret);
+            exit(-1);
+        }
+    } else {
+        ret = convd_conv_file(cvd, input_file->str, 0, output_file->str, 0, 0, 1024, NULL, add_bom);
+        if (ret != 0) {
+            printf("[ERROR] convd_conv_file error(%d).\n", ret);
+            exit(-1);
+        }
     }
 
     convd_release(&cvd);

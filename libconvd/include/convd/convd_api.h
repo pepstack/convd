@@ -124,7 +124,6 @@ typedef enum {
 
 typedef struct
 {
-    int converr;    // DEL
     size_t blen;
     char *bufp;
 } conv_buf_t;
@@ -132,9 +131,13 @@ typedef struct
 
 typedef struct
 {
+    CONVD_UCS_BOM bom;
     char version[16];
     char encoding[CVD_ENCODING_LEN_MAX];
 } conv_xmlhead_t;
+
+
+CONVDAPI int conv_xmlhead_format(const conv_xmlhead_t *xmlhead, conv_buf_t *output);
 
 
 /**
@@ -242,27 +245,6 @@ CONVDAPI int convd_config(const convd_t cvd, int request, void *argument);
 
 CONVDAPI conv_buf_t * convbufMake(conv_buf_t *cvbuf, char *arraybytes, size_t numbytes);
 
-/**
- * Name
- *   convd_conv_text - character set conversion.
- *
- * Return Value
- *   On success, it returns length of bytes (not less than 0) successfully converted;
- *   On error, it returns CONVD_RET_ECONV(-1) and caller can use strerror(errno) to
- *    get more error details.
- *
- * Errors
- *
- *   CONVD_RET_EICONV - Faile to call iconv_open. uses strerror(errno) to get more error details.
- *
- * Notes
- *   input and output should be changed after calling.
- *
- */
-CONVDAPI size_t convd_conv_text(convd_t cvd, conv_buf_t *input, conv_buf_t *output);
-
-CONVDAPI ub8 convd_conv_file(convd_t cvd, const char *textfilein, const char *textfileout, int addbom);
-
 
 /**
  * Name
@@ -293,13 +275,35 @@ CONVDAPI int UCS_file_detect_bom(const char *pathfile, CONVD_UCS_BOM *outbom);
  *
  *   UCS_NONE_BOM - Faile to detect header.
  */
-CONVDAPI int XML_text_parse_head(const conv_buf_t *xmltext, conv_xmlhead_t *xmlhead, CONVD_UCS_BOM *bomtag);
+CONVDAPI int XML_text_parse_head(const conv_buf_t *xmltext, conv_xmlhead_t *xmlhead);
 
-CONVDAPI int XML_file_parse_head(const char *xmlfile, conv_xmlhead_t *xmlhead, CONVD_UCS_BOM *bomtag);
+CONVDAPI int XML_file_parse_head(const char *xmlfile, conv_xmlhead_t *xmlhead);
 
-CONVDAPI int XML_text_encode(conv_buf_t *xmltextin, conv_buf_t *xmltextout, const char *encoding, CONVD_SUFFIX_MODE suffix);
 
-CONVDAPI int XML_file_encode(const char *xmlfile, const char *toxmlfile, const char *encoding, CONVD_SUFFIX_MODE suffix);
+/**
+ * Name
+ *   convd_conv_text - character set conversion.
+ *
+ * Return Value
+ *   On success, it returns length of bytes (not less than 0) successfully converted;
+ *   On error, it returns CONVD_RET_ECONV(-1) and caller can use strerror(errno) to
+ *    get more error details.
+ *
+ * Errors
+ *
+ *   CONVD_RET_EICONV - Faile to call iconv_open. uses strerror(errno) to get more error details.
+ *
+ * Notes
+ *   input and output should be changed after calling.
+ *
+ */
+CONVDAPI size_t convd_conv_text(convd_t cvd, conv_buf_t *input, conv_buf_t *output);
+
+CONVDAPI int convd_conv_file(convd_t cvd, const char *textfilein, size_t inoffset, const char *textfileout, const char *outhead, size_t outheadlen, ub4 linesizemax, ub8 *outfilesize, int addbom);
+
+CONVDAPI size_t convd_conv_xmltext(convd_t cvd, conv_buf_t *input, conv_buf_t *output);
+
+CONVDAPI int convd_conv_xmlfile(convd_t cvd, const char *xmlfilein, const char *xmlfileout, ub4 linesizemax, ub8 *outfilesize, int addbom);
 
 #ifdef __cplusplus
 }

@@ -29,9 +29,11 @@ extern "C" {
 #define CONVD_ERROR_ICONV    ((iconv_t)(-1))
 #define CONVD_ERROR_SIZE     ((size_t)(-1))
 
-#define CONV_CONTINUE       1
-#define CONV_FINISHED       0
-#define CONV_EBREAK       (-1)
+#define CONV_FINISHED          0
+#define CONV_EBREAK          (-1)
+#define CONV_EINSUF          (-2)
+
+#define CONV_LINE_MAXSIZE    ((ub4) 65536)
 
 
 typedef struct _conv_descriptor_t
@@ -45,10 +47,16 @@ typedef struct _conv_descriptor_t
 typedef struct _conv_position_t
 {
     filehandle_t textfd;
-    CONVD_UCS_BOM bom;
     sb8 offset;
-    ub4 totalsize;
-    char encode[CVD_ENCODING_LEN_MAX];
+
+    convd_t cvd;
+    CONVD_UCS_BOM bom;
+
+    char *inputbuf;
+    char *outputbuf;
+
+    ub4 linesize;
+    char linebuf[0];
 } conv_position_t, *convpos_t;
 
 
