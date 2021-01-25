@@ -57,19 +57,20 @@ int main (int argc, char *argv[])
         ret = convd_create(from_code->str, to_code->str, CVD_SUFFIX_IGNORE, &cvd);
     }
 
-    if (ret != CONVD_RET_NOERROR) {
+    if (ret != CONVD_NOERROR) {
         printf("[ERROR] convd_create error(%d)\n", ret);
         exit(-1);
     }
 
     if (cstr_endwith(input_file->str, input_file->len, ".xml", 4)) {
-        ret = convd_conv_xmlfile(cvd, input_file->str, output_file->str, 1024, NULL, add_bom);
+        ret = convd_conv_xmlfile(cvd, input_file->str, output_file->str, 1024, add_bom, NULL);
         if (ret != 0) {
             printf("[ERROR] convd_conv_xmlfile error(%d).\n", ret);
             exit(-1);
         }
     } else {
-        ret = convd_conv_file(cvd, input_file->str, 0, output_file->str, 0, 0, 1024, NULL, add_bom);
+        // TODO: addbom=1
+        ret = convd_conv_file(cvd, input_file->str, 0, output_file->str, 0, 0, 1024, NULL);
         if (ret != 0) {
             printf("[ERROR] convd_conv_file error(%d).\n", ret);
             exit(-1);

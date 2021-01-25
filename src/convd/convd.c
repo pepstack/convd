@@ -42,7 +42,7 @@ static void convd_cleanup_cb (conv_descriptor_t *cvd)
 }
 
 
-conv_buf_t * convbufMake(conv_buf_t *cvbuf, char *arraybytes, size_t numbytes)
+conv_buf_t * convbuf_mk(conv_buf_t *cvbuf, char *arraybytes, size_t numbytes)
 {
     cvbuf->bufp = arraybytes;
     cvbuf->blen = numbytes;
@@ -62,10 +62,10 @@ static int ucs_file_read_open(convd_t cvd, const char *pathfile, ub4 linesizemax
 
         /* try to read first 4 bytes */
         int offcb = file_readbytes(hf, header, 4);
-        bom = UCS_text_detect_bom(convbufMake(&headbuf, header, offcb));
+        bom = UCS_text_detect_bom(convbuf_mk(&headbuf, header, offcb));
         if (bom == UCS_UTF8_BOM_ASK) {
             file_close(&hf);
-            return CONVD_RET_EENCODING;
+            return CONVD_ERR_ENCODING;
         }
 
         offcb = 0;
@@ -78,7 +78,7 @@ static int ucs_file_read_open(convd_t cvd, const char *pathfile, ub4 linesizemax
         }
         if (file_seek(hf, offcb, 0) != offcb) {
             file_close(&hf);
-            return CONVD_RET_EOPEN;
+            return CONVD_ERR_FILE;
         }
 
         if (linesizemax == -1) {
@@ -96,10 +96,10 @@ static int ucs_file_read_open(convd_t cvd, const char *pathfile, ub4 linesizemax
         cpos->outputbuf = &cpos->linebuf[cpos->linesize];
 
         *_cpos= cpos;
-        return CONVD_RET_NOERROR;
+        return CONVD_NOERROR;
     }
 
-    return CONVD_RET_EOPEN;
+    return CONVD_ERR_FILE;
 }
 
 
@@ -110,7 +110,7 @@ static int ucs_file_read_next(convpos_t cpos)
     int offcb = 0;
     int rdlen = file_readbytes(cpos->textfd, cpos->inputbuf, cpos->linesize);
     if (rdlen == -1) {
-        return CONV_EBREAK;
+        return CONVD_ERR_FILE;
     }
     if (rdlen == 0) {
         return CONV_FINISHED;
@@ -162,7 +162,7 @@ static int ucs_file_read_next(convpos_t cpos)
 
         if (offcb == cpos->linesize) {
             /* insufficent buf size for line */
-            return CONV_EINSUF;
+            return CONVD_ERR_INSUFF;
         }
         break;
     }
@@ -170,7 +170,7 @@ static int ucs_file_read_next(convpos_t cpos)
     cpos->offset += offcb;
 
     if (file_seek(cpos->textfd, cpos->offset, fseek_pos_set) != cpos->offset) {
-        return CONV_EBREAK;
+        return CONVD_ERR_FILE;
     }
 
     return offcb;
@@ -219,7 +219,7 @@ int convd_create(const char *fromcode, const char *tocode, CONVD_SUFFIX_MODE suf
         if (cvd->cd == CONVD_ERROR_ICONV) {
             /* Faile to iconv_open. see: errno */
             refc_object_dec((void**)&cvd);
-            return CONVD_ERR_ICONV_OPEN;
+            return CONVD_ERR_ICONV;
         }
 
         /* success */
@@ -244,7 +244,7 @@ int convd_create(const char *fromcode, const char *tocode, CONVD_SUFFIX_MODE suf
     if (cvd->cd == CONVD_ERROR_ICONV) {
         /* Faile to iconv_open. see: errno */
         refc_object_dec((void**)&cvd);
-        return CONVD_ERR_ICONV_OPEN;
+        return CONVD_ERR_ICONV;
     }
 
     /* success */
@@ -280,11 +280,8 @@ const char * convd_tocode(const convd_t cvd)
 int convd_config(const convd_t cvd, int request, void *argument)
 {
     int ret;
-
     refc_object_lock(cvd, 0);
-
     ret = iconvctl(cvd->cd, request, argument);
-
     refc_object_unlock(cvd);
     return ret;
 }
@@ -299,7 +296,7 @@ size_t convd_conv_text(convd_t cvd, conv_buf_t *input, conv_buf_t *output)
     ret = iconv(cvd->cd, NULL, NULL, NULL, NULL);
     if (ret == CONVD_ERROR_SIZE) {
         refc_object_unlock(cvd);
-        return (-1);
+        return CONVD_ERR_ICONV;
     }
 
     outlen = output->blen;
@@ -307,7 +304,7 @@ size_t convd_conv_text(convd_t cvd, conv_buf_t *input, conv_buf_t *output)
         ret = iconv(cvd->cd, &input->bufp, &input->blen, &output->bufp, &output->blen);
         if (ret == CONVD_ERROR_SIZE) {
             refc_object_unlock(cvd);
-            return (-1);
+            return CONVD_ERR_ICONV;
         }
 
         if (input->blen == 0) {
@@ -319,21 +316,19 @@ size_t convd_conv_text(convd_t cvd, conv_buf_t *input, conv_buf_t *output)
     }
 
     refc_object_unlock(cvd);
-    return (-1);
+    return CONVD_ERR_ICONV;
 }
 
 
-/**
- *   https://worthsen.blog.csdn.net/article/details/86585271
- */
-int convd_conv_file(convd_t cvd, const char *textfilein, size_t inoffset, const char *textfileout, const char *outhead, size_t outheadlen, ub4 linesizemax, ub8 *outfilesize, int addbom)
+int convd_conv_file(convd_t cvd, const char *textfilein, size_t inoffset, const char *textfileout, const char *outhead, size_t outheadlen, ub4 linesizemax, ub8 *outfilesize)
 {
     convpos_t cpos;
     ub8 outfdsize = 0;
 
     int ret = ucs_file_read_open(cvd, textfilein, linesizemax, &cpos);
-    if (ret == CONVD_RET_NOERROR) {
+    if (ret == CONVD_NOERROR) {
         filehandle_t outfd = file_write_new(textfileout);
+
         if (outfd != filehandle_invalid) {
             conv_buf_t input, output;
 
@@ -342,7 +337,7 @@ int convd_conv_file(convd_t cvd, const char *textfilein, size_t inoffset, const 
                     /* error */
                     file_close(&outfd);
                     ucs_file_read_close(cpos);
-                    return (-1);
+                    return CONVD_ERR_FILE;
                 }
             }            
 
@@ -350,19 +345,19 @@ int convd_conv_file(convd_t cvd, const char *textfilein, size_t inoffset, const 
             file_seek(cpos->textfd, inoffset, fseek_pos_cur);
 
             while ((ret = ucs_file_read_next(cpos)) > 0) {
-                size_t convcb = convd_conv_text(cvd, convbufMake(&input, cpos->inputbuf, ret), convbufMake(&output, cpos->outputbuf, cpos->linesize * 4));
+                size_t convcb = convd_conv_text(cvd, convbuf_mk(&input, cpos->inputbuf, ret), convbuf_mk(&output, cpos->outputbuf, cpos->linesize * 4));
                 if (convcb == CONVD_ERROR_SIZE) {
                     /* error */
                     file_close(&outfd);
                     ucs_file_read_close(cpos);
-                    return (-1);
+                    return CONVD_ERR_ICONV;
                 }
 
                 if (file_writebytes(outfd, cpos->outputbuf, (ub4)convcb) == -1) {
                     /* error */
                     file_close(&outfd);
                     ucs_file_read_close(cpos);
-                    return (-1);
+                    return CONVD_ERR_FILE;
                 }
 
                 outfdsize += convcb;
@@ -377,6 +372,7 @@ int convd_conv_file(convd_t cvd, const char *textfilein, size_t inoffset, const 
                     *outfilesize = outfdsize;
                 }
             }
+
             return ret;
         }
         ucs_file_read_close(cpos);
@@ -393,10 +389,10 @@ size_t convd_conv_xmltext(convd_t cvd, conv_buf_t *input, conv_buf_t *output)
     size_t convsize = 0;
     int offslen = 0;
 
-    int xmlheadlen = XML_text_parse_head(convbufMake(&inbuf, input->bufp, input->blen), &xmlhead);
+    int xmlheadlen = XML_text_parse_head(convbuf_mk(&inbuf, input->bufp, input->blen), &xmlhead);
 
     if (stricmp(convd_fromcode(cvd), xmlhead.encoding)) {
-        return -1;
+        return CONVD_ERR_ICONV;
     }
 
     if (! memcmp(convd_tocode(cvd), "UTF-8", 5) ||
@@ -408,7 +404,7 @@ size_t convd_conv_xmltext(convd_t cvd, conv_buf_t *input, conv_buf_t *output)
         xmlhead.bom = 0;
         cstr_safecopy(xmlhead.encoding, sizeof(xmlhead.encoding), 0, convd_tocode(cvd), cstr_length(convd_tocode(cvd), sizeof(xmlhead.encoding) - 1));
 
-        offslen = conv_xmlhead_format(&xmlhead, convbufMake(&outbuf, output->bufp, output->blen));
+        offslen = conv_xmlhead_format(&xmlhead, convbuf_mk(&outbuf, output->bufp, output->blen));
     } else {
 
         // TODO:
@@ -416,19 +412,20 @@ size_t convd_conv_xmltext(convd_t cvd, conv_buf_t *input, conv_buf_t *output)
     }
 
     convsize = convd_conv_text(cvd,
-                    convbufMake(&inbuf, &input->bufp[xmlheadlen], input->blen - xmlheadlen),
-                    convbufMake(&outbuf, &output->bufp[offslen], output->blen - offslen));
+                    convbuf_mk(&inbuf, &input->bufp[xmlheadlen], input->blen - xmlheadlen),
+                    convbuf_mk(&outbuf, &output->bufp[offslen], output->blen - offslen));
     if (convsize == -1) {
-        return -1;
+        return CONVD_ERR_ICONV;
     }
 
+    /* success */
     return convsize + (size_t) offslen;
 }
 
 
-int convd_conv_xmlfile(convd_t cvd, const char *xmlfilein, const char *xmlfileout, ub4 linesizemax, ub8 *outfilesize, int addbom)
+int convd_conv_xmlfile(convd_t cvd, const char *xmlfilein, const char *xmlfileout, ub4 linesizemax, int addbom, ub8 *outfilesize)
 {
-    char xmlheadbuf[CVD_ENCODING_LEN_MAX + 16 + 32];
+    char xmlheadbuf[128];
     int xmlheadlen = 0;
 
     conv_xmlhead_t xmlhead;
@@ -450,17 +447,14 @@ int convd_conv_xmlfile(convd_t cvd, const char *xmlfilein, const char *xmlfileou
 
             // ansi == utf8
             xmlhead.bom = 0;
-            if (! cstr_safecopy(xmlhead.encoding, sizeof(xmlhead.encoding), 0, tocode, tocodelen)) {
-                return -1;
-            }
-            xmlheadlen = conv_xmlhead_format(&xmlhead, convbufMake(&output, xmlheadbuf, sizeof(xmlheadbuf)));
+            cstr_safecopy(xmlhead.encoding, sizeof(xmlhead.encoding), 0, tocode, tocodelen);
+            xmlheadlen = conv_xmlhead_format(&xmlhead, convbuf_mk(&output, xmlheadbuf, sizeof(xmlheadbuf)));
         } else {
             // TODO:
             // utf8 -> tocode
         }
 
-        return convd_conv_file(cvd, xmlfilein, headofflen, xmlfileout, xmlheadbuf, xmlheadlen, linesizemax, outfilesize, addbom);
+        return convd_conv_file(cvd, xmlfilein, headofflen, xmlfileout, xmlheadbuf, xmlheadlen, linesizemax, outfilesize);
     }
-
-    return -1;
+    return CONVD_ERR_FILE;
 }

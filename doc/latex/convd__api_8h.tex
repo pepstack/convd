@@ -31,29 +31,17 @@ struct \mbox{\hyperlink{structconv__xmlhead__t}{conv\+\_\+xmlhead\+\_\+t}}
 \mbox{\Hypertarget{convd__api_8h_af10da9f212f363f546138d380742c2d5}\label{convd__api_8h_af10da9f212f363f546138d380742c2d5}} 
 \#define {\bfseries CONVD\+\_\+\+ERR\+\_\+\+SUFFIX}~3
 \item 
-\mbox{\Hypertarget{convd__api_8h_ab6c1f96d95706f9a76e621f05dd8a6ad}\label{convd__api_8h_ab6c1f96d95706f9a76e621f05dd8a6ad}} 
-\#define {\bfseries CONVD\+\_\+\+ERR\+\_\+\+ICONV\+\_\+\+OPEN}~(-\/1)
+\mbox{\Hypertarget{convd__api_8h_ab8e82810ce7dce39fb2b66f1690c0a55}\label{convd__api_8h_ab8e82810ce7dce39fb2b66f1690c0a55}} 
+\#define {\bfseries CONVD\+\_\+\+ERR\+\_\+\+ENCODING}~4
 \item 
-\mbox{\Hypertarget{convd__api_8h_a36f6bb2147fae82b65e67332e800d6fd}\label{convd__api_8h_a36f6bb2147fae82b65e67332e800d6fd}} 
-\#define {\bfseries CONVD\+\_\+\+RET\+\_\+\+NOERROR}~0
+\mbox{\Hypertarget{convd__api_8h_a898f08b3713e1f6ef5e5fbd45a88e004}\label{convd__api_8h_a898f08b3713e1f6ef5e5fbd45a88e004}} 
+\#define {\bfseries CONVD\+\_\+\+ERR\+\_\+\+INSUFF}~5
 \item 
-\mbox{\Hypertarget{convd__api_8h_af7e091ec6ae5a927f811f38f353f446f}\label{convd__api_8h_af7e091ec6ae5a927f811f38f353f446f}} 
-\#define {\bfseries CONVD\+\_\+\+RET\+\_\+\+ERROR}~(-\/1)
+\mbox{\Hypertarget{convd__api_8h_a06ad64046fb8b5584806cf846409100c}\label{convd__api_8h_a06ad64046fb8b5584806cf846409100c}} 
+\#define {\bfseries CONVD\+\_\+\+ERR\+\_\+\+ICONV}~(-\/1)
 \item 
-\mbox{\Hypertarget{convd__api_8h_a9406385591d1c8ff435300d237ba0c7b}\label{convd__api_8h_a9406385591d1c8ff435300d237ba0c7b}} 
-\#define {\bfseries CONVD\+\_\+\+RET\+\_\+\+EICONV}~(-\/1)
-\item 
-\mbox{\Hypertarget{convd__api_8h_ad7e0975a34ddfb2ed92e0f013699cc49}\label{convd__api_8h_ad7e0975a34ddfb2ed92e0f013699cc49}} 
-\#define {\bfseries CONVD\+\_\+\+RET\+\_\+\+EOPEN}~(-\/1)
-\item 
-\mbox{\Hypertarget{convd__api_8h_abb063c1869e7008086648187c7cee1fa}\label{convd__api_8h_abb063c1869e7008086648187c7cee1fa}} 
-\#define {\bfseries CONVD\+\_\+\+RET\+\_\+\+EENCODING}~1
-\item 
-\mbox{\Hypertarget{convd__api_8h_a6b7efbbb06adec05b9e510e0776b0c37}\label{convd__api_8h_a6b7efbbb06adec05b9e510e0776b0c37}} 
-\#define {\bfseries CONVD\+\_\+\+RET\+\_\+\+ESUFFIX}~2
-\item 
-\mbox{\Hypertarget{convd__api_8h_afe6ac6925e497e698909759a3151d69e}\label{convd__api_8h_afe6ac6925e497e698909759a3151d69e}} 
-\#define {\bfseries CONVD\+\_\+\+RET\+\_\+\+EOVERFLOW}~3
+\mbox{\Hypertarget{convd__api_8h_a9b8934d71f292ac7d98daa29d373ee5e}\label{convd__api_8h_a9b8934d71f292ac7d98daa29d373ee5e}} 
+\#define {\bfseries CONVD\+\_\+\+ERR\+\_\+\+FILE}~(-\/2)
 \item 
 \#define \mbox{\hyperlink{convd__api_8h_a3f7c14e82bbddddf2b4c44d0e08a08f3}{CVD\+\_\+\+ENCODING\+\_\+\+LEN\+\_\+\+MAX}}~64
 \end{DoxyCompactItemize}
@@ -89,42 +77,33 @@ CONVDAPI int \mbox{\hyperlink{convd__api_8h_ad4bb1355a3aba27eba92cffc06ba1b56}{c
 \item 
 CONVDAPI int \mbox{\hyperlink{convd__api_8h_a7245b938617fbc7514c526450df7bc93}{convd\+\_\+create}} (const char $\ast$fromcode, const char $\ast$tocode, \mbox{\hyperlink{convd__api_8h_ac49e30a1de789417659c24956265af67}{CONVD\+\_\+\+SUFFIX\+\_\+\+MODE}} suffix, \mbox{\hyperlink{struct__conv__descriptor__t}{convd\+\_\+t}} $\ast$outcvd)
 \item 
-\mbox{\Hypertarget{convd__api_8h_a7d09d1fc296e143a96f6ef4fefdac498}\label{convd__api_8h_a7d09d1fc296e143a96f6ef4fefdac498}} 
-CONVDAPI \mbox{\hyperlink{struct__conv__descriptor__t}{convd\+\_\+t}} {\bfseries convd\+\_\+retain} (\mbox{\hyperlink{struct__conv__descriptor__t}{convd\+\_\+t}} $\ast$cvd)
+CONVDAPI void \mbox{\hyperlink{convd__api_8h_aba8221d5404f5b2a3a2db9d240d9e4c8}{convd\+\_\+release}} (\mbox{\hyperlink{struct__conv__descriptor__t}{convd\+\_\+t}} $\ast$cvd)
 \item 
-\mbox{\Hypertarget{convd__api_8h_aba8221d5404f5b2a3a2db9d240d9e4c8}\label{convd__api_8h_aba8221d5404f5b2a3a2db9d240d9e4c8}} 
-CONVDAPI void {\bfseries convd\+\_\+release} (\mbox{\hyperlink{struct__conv__descriptor__t}{convd\+\_\+t}} $\ast$cvd)
+CONVDAPI \mbox{\hyperlink{struct__conv__descriptor__t}{convd\+\_\+t}} \mbox{\hyperlink{convd__api_8h_a7d09d1fc296e143a96f6ef4fefdac498}{convd\+\_\+retain}} (\mbox{\hyperlink{struct__conv__descriptor__t}{convd\+\_\+t}} $\ast$cvd)
 \item 
-\mbox{\Hypertarget{convd__api_8h_a35b495420689cc2c57887985cd204b61}\label{convd__api_8h_a35b495420689cc2c57887985cd204b61}} 
-CONVDAPI const char $\ast$ {\bfseries convd\+\_\+fromcode} (const \mbox{\hyperlink{struct__conv__descriptor__t}{convd\+\_\+t}} cvd)
+CONVDAPI const char $\ast$ \mbox{\hyperlink{convd__api_8h_a35b495420689cc2c57887985cd204b61}{convd\+\_\+fromcode}} (const \mbox{\hyperlink{struct__conv__descriptor__t}{convd\+\_\+t}} cvd)
 \item 
-\mbox{\Hypertarget{convd__api_8h_a5dc903d357b62d6ac11b403b12712ea7}\label{convd__api_8h_a5dc903d357b62d6ac11b403b12712ea7}} 
-CONVDAPI const char $\ast$ {\bfseries convd\+\_\+tocode} (const \mbox{\hyperlink{struct__conv__descriptor__t}{convd\+\_\+t}} cvd)
+CONVDAPI const char $\ast$ \mbox{\hyperlink{convd__api_8h_a5dc903d357b62d6ac11b403b12712ea7}{convd\+\_\+tocode}} (const \mbox{\hyperlink{struct__conv__descriptor__t}{convd\+\_\+t}} cvd)
 \item 
 CONVDAPI int \mbox{\hyperlink{convd__api_8h_ac1f60cd5d2aeb3a48c3964ad485d8575}{convd\+\_\+config}} (const \mbox{\hyperlink{struct__conv__descriptor__t}{convd\+\_\+t}} cvd, int request, void $\ast$argument)
 \item 
-\mbox{\Hypertarget{convd__api_8h_a69db20d03cbffdee1e7529c3dc3f02a8}\label{convd__api_8h_a69db20d03cbffdee1e7529c3dc3f02a8}} 
-CONVDAPI \mbox{\hyperlink{structconv__buf__t}{conv\+\_\+buf\+\_\+t}} $\ast$ {\bfseries convbuf\+Make} (\mbox{\hyperlink{structconv__buf__t}{conv\+\_\+buf\+\_\+t}} $\ast$cvbuf, char $\ast$arraybytes, size\+\_\+t numbytes)
+CONVDAPI \mbox{\hyperlink{structconv__buf__t}{conv\+\_\+buf\+\_\+t}} $\ast$ \mbox{\hyperlink{convd__api_8h_a5b053f73a37d1e2acd20899d9a8d5e83}{convbuf\+\_\+mk}} (\mbox{\hyperlink{structconv__buf__t}{conv\+\_\+buf\+\_\+t}} $\ast$cvbuf, char $\ast$arraybytes, size\+\_\+t numbytes)
 \item 
 CONVDAPI \mbox{\hyperlink{convd__api_8h_a9724b6972728dc2760ee0e5a0e451ff9}{CONVD\+\_\+\+UCS\+\_\+\+BOM}} \mbox{\hyperlink{convd__api_8h_a5a5b36477fe3d42cafeb6910ca1edcc1}{UCS\+\_\+text\+\_\+detect\+\_\+bom}} (const \mbox{\hyperlink{structconv__buf__t}{conv\+\_\+buf\+\_\+t}} $\ast$textbuf)
 \item 
-\mbox{\Hypertarget{convd__api_8h_a168361091648155469e2885fc0e44227}\label{convd__api_8h_a168361091648155469e2885fc0e44227}} 
-CONVDAPI int {\bfseries UCS\+\_\+file\+\_\+detect\+\_\+bom} (const char $\ast$pathfile, \mbox{\hyperlink{convd__api_8h_a9724b6972728dc2760ee0e5a0e451ff9}{CONVD\+\_\+\+UCS\+\_\+\+BOM}} $\ast$outbom)
+CONVDAPI int \mbox{\hyperlink{convd__api_8h_a168361091648155469e2885fc0e44227}{UCS\+\_\+file\+\_\+detect\+\_\+bom}} (const char $\ast$pathfile, \mbox{\hyperlink{convd__api_8h_a9724b6972728dc2760ee0e5a0e451ff9}{CONVD\+\_\+\+UCS\+\_\+\+BOM}} $\ast$outbom)
 \item 
 CONVDAPI int \mbox{\hyperlink{convd__api_8h_a84c52c1782932e9685113d0bb948574d}{XML\+\_\+text\+\_\+parse\+\_\+head}} (const \mbox{\hyperlink{structconv__buf__t}{conv\+\_\+buf\+\_\+t}} $\ast$xmltext, \mbox{\hyperlink{structconv__xmlhead__t}{conv\+\_\+xmlhead\+\_\+t}} $\ast$xmlhead)
 \item 
-\mbox{\Hypertarget{convd__api_8h_a4598ef96d354e9687d5df47ac6f89f35}\label{convd__api_8h_a4598ef96d354e9687d5df47ac6f89f35}} 
-CONVDAPI int {\bfseries XML\+\_\+file\+\_\+parse\+\_\+head} (const char $\ast$xmlfile, \mbox{\hyperlink{structconv__xmlhead__t}{conv\+\_\+xmlhead\+\_\+t}} $\ast$xmlhead)
+CONVDAPI int \mbox{\hyperlink{convd__api_8h_a4598ef96d354e9687d5df47ac6f89f35}{XML\+\_\+file\+\_\+parse\+\_\+head}} (const char $\ast$xmlfile, \mbox{\hyperlink{structconv__xmlhead__t}{conv\+\_\+xmlhead\+\_\+t}} $\ast$xmlhead)
 \item 
 CONVDAPI size\+\_\+t \mbox{\hyperlink{convd__api_8h_ae857bf28a846196c361204a28b51a6a1}{convd\+\_\+conv\+\_\+text}} (\mbox{\hyperlink{struct__conv__descriptor__t}{convd\+\_\+t}} cvd, \mbox{\hyperlink{structconv__buf__t}{conv\+\_\+buf\+\_\+t}} $\ast$input, \mbox{\hyperlink{structconv__buf__t}{conv\+\_\+buf\+\_\+t}} $\ast$output)
 \item 
-CONVDAPI int \mbox{\hyperlink{convd__api_8h_a7067b69379c299478acebeb5e4db47be}{convd\+\_\+conv\+\_\+file}} (\mbox{\hyperlink{struct__conv__descriptor__t}{convd\+\_\+t}} cvd, const char $\ast$textfilein, size\+\_\+t inoffset, const char $\ast$textfileout, const char $\ast$outhead, size\+\_\+t outheadlen, ub4 linesizemax, ub8 $\ast$outfilesize, int addbom)
+CONVDAPI int \mbox{\hyperlink{convd__api_8h_a18ef9c474ed2a4de65547cc4b446956f}{convd\+\_\+conv\+\_\+file}} (\mbox{\hyperlink{struct__conv__descriptor__t}{convd\+\_\+t}} cvd, const char $\ast$textfilein, size\+\_\+t inoffset, const char $\ast$textfileout, const char $\ast$outhead, size\+\_\+t outheadlen, ub4 linesizemax, ub8 $\ast$outfilesize)
 \item 
-\mbox{\Hypertarget{convd__api_8h_ac05f00f761c61ba149bb73c1ab72b751}\label{convd__api_8h_ac05f00f761c61ba149bb73c1ab72b751}} 
-CONVDAPI size\+\_\+t {\bfseries convd\+\_\+conv\+\_\+xmltext} (\mbox{\hyperlink{struct__conv__descriptor__t}{convd\+\_\+t}} cvd, \mbox{\hyperlink{structconv__buf__t}{conv\+\_\+buf\+\_\+t}} $\ast$input, \mbox{\hyperlink{structconv__buf__t}{conv\+\_\+buf\+\_\+t}} $\ast$output)
+CONVDAPI size\+\_\+t \mbox{\hyperlink{convd__api_8h_ac05f00f761c61ba149bb73c1ab72b751}{convd\+\_\+conv\+\_\+xmltext}} (\mbox{\hyperlink{struct__conv__descriptor__t}{convd\+\_\+t}} cvd, \mbox{\hyperlink{structconv__buf__t}{conv\+\_\+buf\+\_\+t}} $\ast$input, \mbox{\hyperlink{structconv__buf__t}{conv\+\_\+buf\+\_\+t}} $\ast$output)
 \item 
-\mbox{\Hypertarget{convd__api_8h_a08d0b69244f96b7c392dc7aeef1e48e6}\label{convd__api_8h_a08d0b69244f96b7c392dc7aeef1e48e6}} 
-CONVDAPI int {\bfseries convd\+\_\+conv\+\_\+xmlfile} (\mbox{\hyperlink{struct__conv__descriptor__t}{convd\+\_\+t}} cvd, const char $\ast$xmlfilein, const char $\ast$xmlfileout, ub4 linesizemax, ub8 $\ast$outfilesize, int addbom)
+CONVDAPI int \mbox{\hyperlink{convd__api_8h_ad0db213243b1af40232cfdd56979c30e}{convd\+\_\+conv\+\_\+xmlfile}} (\mbox{\hyperlink{struct__conv__descriptor__t}{convd\+\_\+t}} cvd, const char $\ast$xmlfilein, const char $\ast$xmlfileout, ub4 linesizemax, int addbom, ub8 $\ast$outfilesize)
 \end{DoxyCompactItemize}
 
 
@@ -245,47 +224,226 @@ format given xml head to output of ansi string.
 \begin{DoxyReturn}{Returns}
 On success, it returns length of chars in output buf not including ending null char(\textquotesingle{}\textbackslash{}0\textquotesingle{}); On error, it returns\+: 0 -\/ insufficent output buf; -\/1 -\/ unknown bom. 
 \end{DoxyReturn}
+\mbox{\Hypertarget{convd__api_8h_a5b053f73a37d1e2acd20899d9a8d5e83}\label{convd__api_8h_a5b053f73a37d1e2acd20899d9a8d5e83}} 
+\index{convd\_api.h@{convd\_api.h}!convbuf\_mk@{convbuf\_mk}}
+\index{convbuf\_mk@{convbuf\_mk}!convd\_api.h@{convd\_api.h}}
+\doxysubsubsection{\texorpdfstring{convbuf\_mk()}{convbuf\_mk()}}
+{\footnotesize\ttfamily CONVDAPI \mbox{\hyperlink{structconv__buf__t}{conv\+\_\+buf\+\_\+t}}$\ast$ convbuf\+\_\+mk (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{structconv__buf__t}{conv\+\_\+buf\+\_\+t}} $\ast$}]{cvbuf,  }\item[{char $\ast$}]{arraybytes,  }\item[{size\+\_\+t}]{numbytes }\end{DoxyParamCaption})}
+
+Populate a temporary conversion buffer with array of chars. 
+\begin{DoxyParams}[1]{Parameters}
+\mbox{\texttt{ in}}  & {\em cvbuf} & Pointer to a temporary conversion buffer. \\
+\hline
+\mbox{\texttt{ in}}  & {\em arraybytes} & Pointer to the actual chars array. \\
+\hline
+\mbox{\texttt{ in}}  & {\em numbytes} & Allowed size in bytes of arraybytes. \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+The pointer to the input temporary conversion buffer. 
+\end{DoxyReturn}
 \mbox{\Hypertarget{convd__api_8h_ac1f60cd5d2aeb3a48c3964ad485d8575}\label{convd__api_8h_ac1f60cd5d2aeb3a48c3964ad485d8575}} 
 \index{convd\_api.h@{convd\_api.h}!convd\_config@{convd\_config}}
 \index{convd\_config@{convd\_config}!convd\_api.h@{convd\_api.h}}
 \doxysubsubsection{\texorpdfstring{convd\_config()}{convd\_config()}}
 {\footnotesize\ttfamily CONVDAPI int convd\+\_\+config (\begin{DoxyParamCaption}\item[{const \mbox{\hyperlink{struct__conv__descriptor__t}{convd\+\_\+t}}}]{cvd,  }\item[{int}]{request,  }\item[{void $\ast$}]{argument }\end{DoxyParamCaption})}
 
-Name convd\+\_\+config -\/ control and query code conversion behavior.
+Control and query code conversion behavior. 
+\begin{DoxyParams}[1]{Parameters}
+\mbox{\texttt{ in}}  & {\em cvd} & A conversion descriptor created using the function convd\+\_\+create. \\
+\hline
+\mbox{\texttt{ in}}  & {\em request} & The following are the supported values for the request parameter\+:~\newline
 
-Synopsis \#include $<$iconv.\+h$>$ \#include $<$\mbox{\hyperlink{convd__api_8h}{convd\+\_\+api.\+h}}$>$
+\begin{DoxyItemize}
+\item ICONV\+\_\+\+TRIVIALP~\newline
+ argument should be an int $\ast$ which will receive 1 if the conversion is trivial, or 0 otherwise.~\newline
 
-int \mbox{\hyperlink{convd__api_8h_ac1f60cd5d2aeb3a48c3964ad485d8575}{convd\+\_\+config(const convd\+\_\+t cvd, int request, void $\ast$arg)}};
+\item ICONV\+\_\+\+GET\+\_\+\+TRANSLITERATE~\newline
+ argument should be an int $\ast$ which will receive 1 if transliteration is enabled in the conversion, or 0 otherwise.~\newline
 
-Description The convd\+\_\+config function is a direct wrapper of iconvctl() (see\+: iconv.\+h) and can be used to control code conversion behavior by setting or getting the current code conversion behavior settings from the current code conversion pointed to by the conversion descriptor that was returned from a successful convd\+\_\+create call.
+\item ICONV\+\_\+\+SET\+\_\+\+TRANSLITERATE~\newline
+ argument should be a const int $\ast$, pointing to an int value. A non-\/zero value is used to enable transliteration in the conversion. A zero value disables it.~\newline
 
-The following are the supported values for the request argument\+: (See also\+: \href{https://docs.oracle.com/cd/E36784_01/html/E36874/iconvctl-3c.html}{\texttt{ https\+://docs.\+oracle.\+com/cd/\+E36784\+\_\+01/html/\+E36874/iconvctl-\/3c.\+html}})
+\item ICONV\+\_\+\+GET\+\_\+\+DISCARD\+\_\+\+ILSEQ~\newline
+ argument should be an int $\ast$ which will receive 1 if \char`\"{}illegal sequence discard and continue\char`\"{} is enabled in the conversion, or 0 otherwise.~\newline
 
-ICONV\+\_\+\+GET\+\_\+\+CONVERSION\+\_\+\+BEHAVIOR ICONV\+\_\+\+SET\+\_\+\+CONVERSION\+\_\+\+BEHAVIOR ICONV\+\_\+\+GET\+\_\+\+DISCARD\+\_\+\+ILSEQ ICONV\+\_\+\+SET\+\_\+\+DISCARD\+\_\+\+ILSEQ ICONV\+\_\+\+GET\+\_\+\+TRANSLITERATE ICONV\+\_\+\+SET\+\_\+\+TRANSLITERATE ICONV\+\_\+\+TRIVIALP
-
-Return Value Upon successful completion, \mbox{\hyperlink{convd__api_8h_ac1f60cd5d2aeb3a48c3964ad485d8575}{convd\+\_\+config()}} returns 0 and, optionally, with a value pointed to by the arg argument. Otherwise, \mbox{\hyperlink{convd__api_8h_ac1f60cd5d2aeb3a48c3964ad485d8575}{convd\+\_\+config()}} returns -\/1 and sets errno to indicate the error.
-
-Notes convd\+\_\+config is MT-\/safety. \mbox{\Hypertarget{convd__api_8h_a7067b69379c299478acebeb5e4db47be}\label{convd__api_8h_a7067b69379c299478acebeb5e4db47be}} 
+\item ICONV\+\_\+\+SET\+\_\+\+DISCARD\+\_\+\+ILSEQ~\newline
+ argument should be a const int $\ast$, pointing to an int value. A non-\/zero value is used to enable \char`\"{}illegal sequence discard and continue\char`\"{} in the conversion. A zero value disables it.~\newline
+ 
+\end{DoxyItemize}\\
+\hline
+\mbox{\texttt{ out}}  & {\em argument} & see the above request parameter.\\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+Upon successful completion, \mbox{\hyperlink{convd__api_8h_ac1f60cd5d2aeb3a48c3964ad485d8575}{convd\+\_\+config()}} returns 0 and, optionally, with a value pointed to by the argument.~\newline
+ Otherwise, \mbox{\hyperlink{convd__api_8h_ac1f60cd5d2aeb3a48c3964ad485d8575}{convd\+\_\+config()}} returns -\/1 and sets errno to indicate the error. 
+\end{DoxyReturn}
+\begin{DoxyNote}{Note}
+The convd\+\_\+config function is a direct wrapper of iconvctl() (see\+: iconv.\+h)~\newline
+ iconvctl() queries or adjusts the behavior of the iconv function, when invoked with the specified conversion descriptor, depending on the request value.~\newline
+ This function is implemented only in GNU libiconv and not in other iconv implementations.~\newline
+ It is not backed by a standard. You can test for its presence through (\+\_\+\+LIBICONV\+\_\+\+VERSION $>$= 0x0108).~\newline
+ \mbox{\hyperlink{convd__api_8h_ac1f60cd5d2aeb3a48c3964ad485d8575}{convd\+\_\+config()}} is also MT-\/safe. 
+\end{DoxyNote}
+\begin{DoxySeeAlso}{See also}
+\href{https://www.gnu.org/savannah-checkouts/gnu/libiconv/documentation/libiconv-1.15/iconvctl.3.html}{\texttt{ https\+://www.\+gnu.\+org/savannah-\/checkouts/gnu/libiconv/documentation/libiconv-\/1.\+15/iconvctl.\+3.\+html}} 
+\end{DoxySeeAlso}
+\mbox{\Hypertarget{convd__api_8h_a18ef9c474ed2a4de65547cc4b446956f}\label{convd__api_8h_a18ef9c474ed2a4de65547cc4b446956f}} 
 \index{convd\_api.h@{convd\_api.h}!convd\_conv\_file@{convd\_conv\_file}}
 \index{convd\_conv\_file@{convd\_conv\_file}!convd\_api.h@{convd\_api.h}}
 \doxysubsubsection{\texorpdfstring{convd\_conv\_file()}{convd\_conv\_file()}}
-{\footnotesize\ttfamily CONVDAPI int convd\+\_\+conv\+\_\+file (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{struct__conv__descriptor__t}{convd\+\_\+t}}}]{cvd,  }\item[{const char $\ast$}]{textfilein,  }\item[{size\+\_\+t}]{inoffset,  }\item[{const char $\ast$}]{textfileout,  }\item[{const char $\ast$}]{outhead,  }\item[{size\+\_\+t}]{outheadlen,  }\item[{ub4}]{linesizemax,  }\item[{ub8 $\ast$}]{outfilesize,  }\item[{int}]{addbom }\end{DoxyParamCaption})}
+{\footnotesize\ttfamily CONVDAPI int convd\+\_\+conv\+\_\+file (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{struct__conv__descriptor__t}{convd\+\_\+t}}}]{cvd,  }\item[{const char $\ast$}]{textfilein,  }\item[{size\+\_\+t}]{inoffset,  }\item[{const char $\ast$}]{textfileout,  }\item[{const char $\ast$}]{outhead,  }\item[{size\+\_\+t}]{outheadlen,  }\item[{ub4}]{linesizemax,  }\item[{ub8 $\ast$}]{outfilesize }\end{DoxyParamCaption})}
 
-\href{https://worthsen.blog.csdn.net/article/details/86585271}{\texttt{ https\+://worthsen.\+blog.\+csdn.\+net/article/details/86585271}} \mbox{\Hypertarget{convd__api_8h_ae857bf28a846196c361204a28b51a6a1}\label{convd__api_8h_ae857bf28a846196c361204a28b51a6a1}} 
+Convert characters from input file to output file. 
+\begin{DoxyParams}[1]{Parameters}
+\mbox{\texttt{ in}}  & {\em cvd} & The conversion descriptor. \\
+\hline
+\mbox{\texttt{ in}}  & {\em textfilein} & Full path to the input text file to be converted. \\
+\hline
+\mbox{\texttt{ in}}  & {\em inoffset} & The size in bytes should be ignord in textfilein.~\newline
+ set it to 0 that asks to convert from the beginning of the input file. \\
+\hline
+\mbox{\texttt{ in}}  & {\em textfileout} & Full path to the output file as result of conversion.~\newline
+ The textfileout must not exist before calling. \\
+\hline
+\mbox{\texttt{ in}}  & {\em outhead} & Optional content to be written into the head of output file. \\
+\hline
+\mbox{\texttt{ in}}  & {\em outheadlen} & Size in bytes of outhead. \\
+\hline
+\mbox{\texttt{ in}}  & {\em linesizemax} & Max line size in bytes for textfilein.~\newline
+ This important argument must be big enough to read entire line of input text. \\
+\hline
+\mbox{\texttt{ out}}  & {\em outfilesize} & Optional parameter to save bytes size of textfileout.~\newline
+ \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+Upon successful completion, it returns \mbox{\hyperlink{convd__api_8h_a46ee8e8fabb7320b3003ed8a73c510cd}{CONVD\+\_\+\+NOERROR(0)}}.~\newline
+ Otherwise, returns error codes list in the following\+:~\newline
+
+\begin{DoxyItemize}
+\item CONVD\+\_\+\+ERR\+\_\+\+ENCODING~\newline
+ Not a regular text file.
+\item CONVD\+\_\+\+ERR\+\_\+\+INSUFF~\newline
+ Insufficent line size for reading. You should increase linesizemax and try again.
+\item CONVD\+\_\+\+ERR\+\_\+\+ICONV~\newline
+ Error occurred while calling iconv().
+\item CONVD\+\_\+\+ERR\+\_\+\+FILE~\newline
+ Error occurred while reading or writing file. 
+\end{DoxyItemize}
+\end{DoxyReturn}
+\begin{DoxyNote}{Note}
+The \mbox{\hyperlink{convd__api_8h_a18ef9c474ed2a4de65547cc4b446956f}{convd\+\_\+conv\+\_\+file()}} function converts characters file in one~\newline
+ charset encoding to characters file in another charset encoding.~\newline
+ 
+\end{DoxyNote}
+\begin{DoxySeeAlso}{See also}
+\href{https://man7.org/linux/man-pages/man3/iconv.3.html}{\texttt{ https\+://man7.\+org/linux/man-\/pages/man3/iconv.\+3.\+html}} 
+\end{DoxySeeAlso}
+\mbox{\Hypertarget{convd__api_8h_ae857bf28a846196c361204a28b51a6a1}\label{convd__api_8h_ae857bf28a846196c361204a28b51a6a1}} 
 \index{convd\_api.h@{convd\_api.h}!convd\_conv\_text@{convd\_conv\_text}}
 \index{convd\_conv\_text@{convd\_conv\_text}!convd\_api.h@{convd\_api.h}}
 \doxysubsubsection{\texorpdfstring{convd\_conv\_text()}{convd\_conv\_text()}}
 {\footnotesize\ttfamily CONVDAPI size\+\_\+t convd\+\_\+conv\+\_\+text (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{struct__conv__descriptor__t}{convd\+\_\+t}}}]{cvd,  }\item[{\mbox{\hyperlink{structconv__buf__t}{conv\+\_\+buf\+\_\+t}} $\ast$}]{input,  }\item[{\mbox{\hyperlink{structconv__buf__t}{conv\+\_\+buf\+\_\+t}} $\ast$}]{output }\end{DoxyParamCaption})}
 
-Name convd\+\_\+conv\+\_\+text -\/ character set conversion.
+Convert characters from input to output. 
+\begin{DoxyParams}[1]{Parameters}
+\mbox{\texttt{ in}}  & {\em cvd} & The conversion descriptor. \\
+\hline
+\mbox{\texttt{ in}}  & {\em input} & The input argument points to the characters of the input sequence. \\
+\hline
+\mbox{\texttt{ out}}  & {\em output} & The output argument points to the characters of the output sequence. \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+Upon successful completion, it returns number of bytes saved in output buffer.~\newline
+ Otherwise, returns CONVD\+\_\+\+ERR\+\_\+\+ICONV(-\/1) and might set errno to indicate the error. 
+\end{DoxyReturn}
+\begin{DoxyNote}{Note}
+The \mbox{\hyperlink{convd__api_8h_ae857bf28a846196c361204a28b51a6a1}{convd\+\_\+conv\+\_\+text()}} function converts a sequence of characters in one~\newline
+ charset encoding to a sequence of characters in another charset encoding.~\newline
+ 
+\end{DoxyNote}
+\begin{DoxySeeAlso}{See also}
+\href{https://man7.org/linux/man-pages/man3/iconv.3.html}{\texttt{ https\+://man7.\+org/linux/man-\/pages/man3/iconv.\+3.\+html}} 
+\end{DoxySeeAlso}
+\mbox{\Hypertarget{convd__api_8h_ad0db213243b1af40232cfdd56979c30e}\label{convd__api_8h_ad0db213243b1af40232cfdd56979c30e}} 
+\index{convd\_api.h@{convd\_api.h}!convd\_conv\_xmlfile@{convd\_conv\_xmlfile}}
+\index{convd\_conv\_xmlfile@{convd\_conv\_xmlfile}!convd\_api.h@{convd\_api.h}}
+\doxysubsubsection{\texorpdfstring{convd\_conv\_xmlfile()}{convd\_conv\_xmlfile()}}
+{\footnotesize\ttfamily CONVDAPI int convd\+\_\+conv\+\_\+xmlfile (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{struct__conv__descriptor__t}{convd\+\_\+t}}}]{cvd,  }\item[{const char $\ast$}]{xmlfilein,  }\item[{const char $\ast$}]{xmlfileout,  }\item[{ub4}]{linesizemax,  }\item[{int}]{addbom,  }\item[{ub8 $\ast$}]{outfilesize }\end{DoxyParamCaption})}
 
-Return Value On success, it returns length of bytes (not less than 0) successfully converted; On error, it returns CONVD\+\_\+\+RET\+\_\+\+ECONV(-\/1) and caller can use strerror(errno) to get more error details.
+Convert characters from input xml file to output xml file. 
+\begin{DoxyParams}[1]{Parameters}
+\mbox{\texttt{ in}}  & {\em cvd} & The conversion descriptor. \\
+\hline
+\mbox{\texttt{ in}}  & {\em xmlfilein} & Full path to the input xml file to be converted. \\
+\hline
+\mbox{\texttt{ in}}  & {\em xmlfileout} & Full path to the output xml file as result of conversion.~\newline
+ The output file must not exist before calling. \\
+\hline
+\mbox{\texttt{ in}}  & {\em addbom} & Optional BOM to be written into the head of output file. \\
+\hline
+\mbox{\texttt{ in}}  & {\em linesizemax} & Max size in bytes of buffer for reading input file.~\newline
+ This important argument must be big enough to read entire line of input file. \\
+\hline
+\mbox{\texttt{ out}}  & {\em outfilesize} & Optional parameter to save bytes size of output xml file.~\newline
+ \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+Upon successful completion, it returns \mbox{\hyperlink{convd__api_8h_a46ee8e8fabb7320b3003ed8a73c510cd}{CONVD\+\_\+\+NOERROR(0)}}.~\newline
+ Otherwise, returns error codes list in the following\+:~\newline
 
-Errors
+\begin{DoxyItemize}
+\item CONVD\+\_\+\+ERR\+\_\+\+ENCODING~\newline
+ Not a regular text file.
+\item CONVD\+\_\+\+ERR\+\_\+\+INSUFF~\newline
+ Insufficent line size for reading. You should increase linesizemax and try again.
+\item CONVD\+\_\+\+ERR\+\_\+\+ICONV~\newline
+ Error occurred while calling iconv().
+\item CONVD\+\_\+\+ERR\+\_\+\+FILE~\newline
+ Error occurred while reading or writing file. 
+\end{DoxyItemize}
+\end{DoxyReturn}
+\begin{DoxyNote}{Note}
+The \mbox{\hyperlink{convd__api_8h_ad0db213243b1af40232cfdd56979c30e}{convd\+\_\+conv\+\_\+xmlfile()}} function converts xml characters file in one~\newline
+ charset encoding to xml characters file in another charset encoding.~\newline
+ 
+\end{DoxyNote}
+\begin{DoxySeeAlso}{See also}
+\href{https://man7.org/linux/man-pages/man3/iconv.3.html}{\texttt{ https\+://man7.\+org/linux/man-\/pages/man3/iconv.\+3.\+html}} 
+\end{DoxySeeAlso}
+\mbox{\Hypertarget{convd__api_8h_ac05f00f761c61ba149bb73c1ab72b751}\label{convd__api_8h_ac05f00f761c61ba149bb73c1ab72b751}} 
+\index{convd\_api.h@{convd\_api.h}!convd\_conv\_xmltext@{convd\_conv\_xmltext}}
+\index{convd\_conv\_xmltext@{convd\_conv\_xmltext}!convd\_api.h@{convd\_api.h}}
+\doxysubsubsection{\texorpdfstring{convd\_conv\_xmltext()}{convd\_conv\_xmltext()}}
+{\footnotesize\ttfamily CONVDAPI size\+\_\+t convd\+\_\+conv\+\_\+xmltext (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{struct__conv__descriptor__t}{convd\+\_\+t}}}]{cvd,  }\item[{\mbox{\hyperlink{structconv__buf__t}{conv\+\_\+buf\+\_\+t}} $\ast$}]{input,  }\item[{\mbox{\hyperlink{structconv__buf__t}{conv\+\_\+buf\+\_\+t}} $\ast$}]{output }\end{DoxyParamCaption})}
 
-CONVD\+\_\+\+RET\+\_\+\+EICONV -\/ Faile to call iconv\+\_\+open. uses strerror(errno) to get more error details.
-
-Notes input and output should be changed after calling. \mbox{\Hypertarget{convd__api_8h_a7245b938617fbc7514c526450df7bc93}\label{convd__api_8h_a7245b938617fbc7514c526450df7bc93}} 
+Convert xml characters from input to output. 
+\begin{DoxyParams}[1]{Parameters}
+\mbox{\texttt{ in}}  & {\em cvd} & The conversion descriptor. \\
+\hline
+\mbox{\texttt{ in}}  & {\em input} & The input xml characters sequence to be converted from. \\
+\hline
+\mbox{\texttt{ out}}  & {\em output} & The output xml characters sequence to be converted to. \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+Upon successful completion, it returns number of bytes converted to in output buffer.~\newline
+ Otherwise, returns CONVD\+\_\+\+ERR\+\_\+\+ICONV(-\/1) and might set errno to indicate the error. 
+\end{DoxyReturn}
+\begin{DoxyNote}{Note}
+The \mbox{\hyperlink{convd__api_8h_ac05f00f761c61ba149bb73c1ab72b751}{convd\+\_\+conv\+\_\+xmltext()}} function converts a sequence of xml characters in one~\newline
+ charset encoding to a sequence of xml characters in another charset encoding.~\newline
+ The encoding attribute in the first line of output xml will be assigned with tocode.~\newline
+ 
+\end{DoxyNote}
+\begin{DoxySeeAlso}{See also}
+\mbox{\hyperlink{convd__api_8h_ae857bf28a846196c361204a28b51a6a1}{convd\+\_\+conv\+\_\+text()}} 
+\end{DoxySeeAlso}
+\mbox{\Hypertarget{convd__api_8h_a7245b938617fbc7514c526450df7bc93}\label{convd__api_8h_a7245b938617fbc7514c526450df7bc93}} 
 \index{convd\_api.h@{convd\_api.h}!convd\_create@{convd\_create}}
 \index{convd\_create@{convd\_create}!convd\_api.h@{convd\_api.h}}
 \doxysubsubsection{\texorpdfstring{convd\_create()}{convd\_create()}}
@@ -293,46 +451,170 @@ Notes input and output should be changed after calling. \mbox{\Hypertarget{convd
 
 Create a new convd\+\_\+t object. 
 \begin{DoxyParams}[1]{Parameters}
-\mbox{\texttt{ in}}  & {\em fromcode} & Convert characters from encoding \\
+\mbox{\texttt{ in}}  & {\em fromcode} & Convert characters from encoding. \\
 \hline
-\mbox{\texttt{ in}}  & {\em tocode} & Convert characters to encoding \\
+\mbox{\texttt{ in}}  & {\em tocode} & Convert characters to encoding. \\
 \hline
-\mbox{\texttt{ in}}  & {\em suffix} & Options controlling conversion problems ~\newline
+\mbox{\texttt{ in}}  & {\em suffix} & Options controlling conversion problems. ~\newline
  \\
 \hline
 \mbox{\texttt{ out}}  & {\em outcvd} & The conversion descriptor relates the two encoded character sets. \\
 \hline
 \end{DoxyParams}
 \begin{DoxyReturn}{Returns}
-On success, it returns CONVD\+\_\+\+NOERROR(=0) and the out parameter of outcvd is set by a convd\+\_\+t object; On error, it returns an error code like CONVD\+\_\+\+ERR\+\_\+?, and out parameter of outcvd is undefined.
-\end{DoxyReturn}
-@retal CONVD\+\_\+\+NOERROR success @retal CONVD\+\_\+\+ERR\+\_\+\+FROMCODE invalid value for fromcode @retal CONVD\+\_\+\+ERR\+\_\+\+TOCODE invalid value for tocode @retal CONVD\+\_\+\+ERR\+\_\+\+SUFFIX invalid value for suffix @retal CONVD\+\_\+\+ERR\+\_\+\+ICONV\+\_\+\+OPEN an error occurred while calling iconv\+\_\+open().
+On success, it returns CONVD\+\_\+\+NOERROR(=0) and the out parameter of outcvd is set by a convd\+\_\+t object;~\newline
+ On error, it returns an error code like CONVD\+\_\+\+ERR\+\_\+?, and out parameter of outcvd is undefined.~\newline
+ The following errors can occur\+:~\newline
 
+\begin{DoxyItemize}
+\item CONVD\+\_\+\+ERR\+\_\+\+FROMCODE~\newline
+ invalid value for fromcode
+\item CONVD\+\_\+\+ERR\+\_\+\+TOCODE~\newline
+ invalid value for tocode
+\item CONVD\+\_\+\+ERR\+\_\+\+SUFFIX~\newline
+ invalid value for suffix
+\item CONVD\+\_\+\+ERR\+\_\+\+ICONV~\newline
+ an error occurred while calling iconv\+\_\+open().
+\end{DoxyItemize}
+\end{DoxyReturn}
 \begin{DoxyNote}{Note}
-convd\+\_\+t object can be safely accessed from multiple threads (MT-\/safe). 
+The convd\+\_\+t object maintains a count of the number of references to itself.~\newline
+ The initial reference count of a new reference-\/counted object is 1.~\newline
+ convd\+\_\+t object can be safely accessed from multiple threads (MT-\/safe). 
 \end{DoxyNote}
+\mbox{\Hypertarget{convd__api_8h_a35b495420689cc2c57887985cd204b61}\label{convd__api_8h_a35b495420689cc2c57887985cd204b61}} 
+\index{convd\_api.h@{convd\_api.h}!convd\_fromcode@{convd\_fromcode}}
+\index{convd\_fromcode@{convd\_fromcode}!convd\_api.h@{convd\_api.h}}
+\doxysubsubsection{\texorpdfstring{convd\_fromcode()}{convd\_fromcode()}}
+{\footnotesize\ttfamily CONVDAPI const char$\ast$ convd\+\_\+fromcode (\begin{DoxyParamCaption}\item[{const \mbox{\hyperlink{struct__conv__descriptor__t}{convd\+\_\+t}}}]{cvd }\end{DoxyParamCaption})}
+
+Get characters encoding from which convert. 
+\begin{DoxyParams}[1]{Parameters}
+\mbox{\texttt{ in}}  & {\em cvd} & A convd\+\_\+t object. \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+The read only string of from code. 
+\end{DoxyReturn}
+\begin{DoxySeeAlso}{See also}
+\mbox{\hyperlink{convd__api_8h_a7245b938617fbc7514c526450df7bc93}{convd\+\_\+create}} 
+\end{DoxySeeAlso}
+\mbox{\Hypertarget{convd__api_8h_aba8221d5404f5b2a3a2db9d240d9e4c8}\label{convd__api_8h_aba8221d5404f5b2a3a2db9d240d9e4c8}} 
+\index{convd\_api.h@{convd\_api.h}!convd\_release@{convd\_release}}
+\index{convd\_release@{convd\_release}!convd\_api.h@{convd\_api.h}}
+\doxysubsubsection{\texorpdfstring{convd\_release()}{convd\_release()}}
+{\footnotesize\ttfamily CONVDAPI void convd\+\_\+release (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{struct__conv__descriptor__t}{convd\+\_\+t}} $\ast$}]{cvd }\end{DoxyParamCaption})}
+
+Decrement the reference count of convd\+\_\+t object. 
+\begin{DoxyParams}[1]{Parameters}
+\mbox{\texttt{ in}}  & {\em cvd} & The pointer to a convd\+\_\+t object to be released. \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+None
+\end{DoxyReturn}
+\begin{DoxyNote}{Note}
+When release the reference-\/counted object, its reference count is decreased by 1.~\newline
+ If the reference count reaches at 0, the reference-\/counted object is deallocated. 
+\end{DoxyNote}
+\mbox{\Hypertarget{convd__api_8h_a7d09d1fc296e143a96f6ef4fefdac498}\label{convd__api_8h_a7d09d1fc296e143a96f6ef4fefdac498}} 
+\index{convd\_api.h@{convd\_api.h}!convd\_retain@{convd\_retain}}
+\index{convd\_retain@{convd\_retain}!convd\_api.h@{convd\_api.h}}
+\doxysubsubsection{\texorpdfstring{convd\_retain()}{convd\_retain()}}
+{\footnotesize\ttfamily CONVDAPI \mbox{\hyperlink{struct__conv__descriptor__t}{convd\+\_\+t}} convd\+\_\+retain (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{struct__conv__descriptor__t}{convd\+\_\+t}} $\ast$}]{cvd }\end{DoxyParamCaption})}
+
+Increment the reference count of convd\+\_\+t object. 
+\begin{DoxyParams}[1]{Parameters}
+\mbox{\texttt{ in}}  & {\em cvd} & The pointer to a convd\+\_\+t object to be increment. \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+The convd\+\_\+t object itself.
+\end{DoxyReturn}
+\begin{DoxyNote}{Note}
+When retain the reference-\/counted object, its reference count is increased by 1.~\newline
+ You must release a reference-\/counted object once after it has been created or retained. 
+\end{DoxyNote}
+\mbox{\Hypertarget{convd__api_8h_a5dc903d357b62d6ac11b403b12712ea7}\label{convd__api_8h_a5dc903d357b62d6ac11b403b12712ea7}} 
+\index{convd\_api.h@{convd\_api.h}!convd\_tocode@{convd\_tocode}}
+\index{convd\_tocode@{convd\_tocode}!convd\_api.h@{convd\_api.h}}
+\doxysubsubsection{\texorpdfstring{convd\_tocode()}{convd\_tocode()}}
+{\footnotesize\ttfamily CONVDAPI const char$\ast$ convd\+\_\+tocode (\begin{DoxyParamCaption}\item[{const \mbox{\hyperlink{struct__conv__descriptor__t}{convd\+\_\+t}}}]{cvd }\end{DoxyParamCaption})}
+
+Get characters encoding to which convert. 
+\begin{DoxyParams}[1]{Parameters}
+\mbox{\texttt{ in}}  & {\em cvd} & A convd\+\_\+t object. \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+The read only string of to code. 
+\end{DoxyReturn}
+\begin{DoxySeeAlso}{See also}
+\mbox{\hyperlink{convd__api_8h_a7245b938617fbc7514c526450df7bc93}{convd\+\_\+create}} 
+\end{DoxySeeAlso}
+\mbox{\Hypertarget{convd__api_8h_a168361091648155469e2885fc0e44227}\label{convd__api_8h_a168361091648155469e2885fc0e44227}} 
+\index{convd\_api.h@{convd\_api.h}!UCS\_file\_detect\_bom@{UCS\_file\_detect\_bom}}
+\index{UCS\_file\_detect\_bom@{UCS\_file\_detect\_bom}!convd\_api.h@{convd\_api.h}}
+\doxysubsubsection{\texorpdfstring{UCS\_file\_detect\_bom()}{UCS\_file\_detect\_bom()}}
+{\footnotesize\ttfamily CONVDAPI int UCS\+\_\+file\+\_\+detect\+\_\+bom (\begin{DoxyParamCaption}\item[{const char $\ast$}]{pathfile,  }\item[{\mbox{\hyperlink{convd__api_8h_a9724b6972728dc2760ee0e5a0e451ff9}{CONVD\+\_\+\+UCS\+\_\+\+BOM}} $\ast$}]{outbom }\end{DoxyParamCaption})}
+
+Detect the BOM (Byte Order Mark) of an UCS (Unicode Character Set) text file. 
+\begin{DoxyParams}[1]{Parameters}
+\mbox{\texttt{ in}}  & {\em pathfile} & Full path to a text file to be BOM detected. \\
+\hline
+\mbox{\texttt{ out}}  & {\em outbom} & Upon successful completion it is set by one value of CONVD\+\_\+\+UCS\+\_\+\+BOM. \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+Upon successful completion, it returns 0.~\newline
+ Otherwise, returns CONVD\+\_\+\+ERR\+\_\+\+FILE(-\/1) and sets errno to indicate the error. 
+\end{DoxyReturn}
 \mbox{\Hypertarget{convd__api_8h_a5a5b36477fe3d42cafeb6910ca1edcc1}\label{convd__api_8h_a5a5b36477fe3d42cafeb6910ca1edcc1}} 
 \index{convd\_api.h@{convd\_api.h}!UCS\_text\_detect\_bom@{UCS\_text\_detect\_bom}}
 \index{UCS\_text\_detect\_bom@{UCS\_text\_detect\_bom}!convd\_api.h@{convd\_api.h}}
 \doxysubsubsection{\texorpdfstring{UCS\_text\_detect\_bom()}{UCS\_text\_detect\_bom()}}
 {\footnotesize\ttfamily CONVDAPI \mbox{\hyperlink{convd__api_8h_a9724b6972728dc2760ee0e5a0e451ff9}{CONVD\+\_\+\+UCS\+\_\+\+BOM}} UCS\+\_\+text\+\_\+detect\+\_\+bom (\begin{DoxyParamCaption}\item[{const \mbox{\hyperlink{structconv__buf__t}{conv\+\_\+buf\+\_\+t}} $\ast$}]{textbuf }\end{DoxyParamCaption})}
 
-Name UCS\+\_\+text\+\_\+detect\+\_\+bom -\/ detect text buffer for bom tag. UCS\+\_\+file\+\_\+detect\+\_\+bom -\/ detect file for bom tag.
+Detect the BOM (Byte Order Mark) of an UCS (Unicode Character Set) text. 
+\begin{DoxyParams}[1]{Parameters}
+\mbox{\texttt{ in}}  & {\em textbuf} & buffer for UCS text to be BOM detected. \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+one value of CONVD\+\_\+\+UCS\+\_\+\+BOM. 
+\end{DoxyReturn}
+\mbox{\Hypertarget{convd__api_8h_a4598ef96d354e9687d5df47ac6f89f35}\label{convd__api_8h_a4598ef96d354e9687d5df47ac6f89f35}} 
+\index{convd\_api.h@{convd\_api.h}!XML\_file\_parse\_head@{XML\_file\_parse\_head}}
+\index{XML\_file\_parse\_head@{XML\_file\_parse\_head}!convd\_api.h@{convd\_api.h}}
+\doxysubsubsection{\texorpdfstring{XML\_file\_parse\_head()}{XML\_file\_parse\_head()}}
+{\footnotesize\ttfamily CONVDAPI int XML\+\_\+file\+\_\+parse\+\_\+head (\begin{DoxyParamCaption}\item[{const char $\ast$}]{xmlfile,  }\item[{\mbox{\hyperlink{structconv__xmlhead__t}{conv\+\_\+xmlhead\+\_\+t}} $\ast$}]{xmlhead }\end{DoxyParamCaption})}
 
-Return Value Always returns one of CONVD\+\_\+\+UCS\+\_\+\+BOM.
-
-Errors
-
-UCS\+\_\+\+NONE\+\_\+\+BOM -\/ Faile to detect header. \mbox{\Hypertarget{convd__api_8h_a84c52c1782932e9685113d0bb948574d}\label{convd__api_8h_a84c52c1782932e9685113d0bb948574d}} 
+Parse xml file to get xml head. 
+\begin{DoxyParams}[1]{Parameters}
+\mbox{\texttt{ in}}  & {\em xmlfile} & Full path to an xml file to be xmlhead parsed. \\
+\hline
+\mbox{\texttt{ out}}  & {\em xmlhead} & Upon successful completion its members are set. \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+Upon successful completion, it returns bytes length($>$0) of xml head in the xmlfile.~\newline
+ Otherwise, returns 0 to indicate the xml head not found, or returns CONVD\+\_\+\+ERR\+\_\+\+FILE(-\/1)~\newline
+ and sets errno to indicate the error. 
+\end{DoxyReturn}
+\mbox{\Hypertarget{convd__api_8h_a84c52c1782932e9685113d0bb948574d}\label{convd__api_8h_a84c52c1782932e9685113d0bb948574d}} 
 \index{convd\_api.h@{convd\_api.h}!XML\_text\_parse\_head@{XML\_text\_parse\_head}}
 \index{XML\_text\_parse\_head@{XML\_text\_parse\_head}!convd\_api.h@{convd\_api.h}}
 \doxysubsubsection{\texorpdfstring{XML\_text\_parse\_head()}{XML\_text\_parse\_head()}}
 {\footnotesize\ttfamily CONVDAPI int XML\+\_\+text\+\_\+parse\+\_\+head (\begin{DoxyParamCaption}\item[{const \mbox{\hyperlink{structconv__buf__t}{conv\+\_\+buf\+\_\+t}} $\ast$}]{xmltext,  }\item[{\mbox{\hyperlink{structconv__xmlhead__t}{conv\+\_\+xmlhead\+\_\+t}} $\ast$}]{xmlhead }\end{DoxyParamCaption})}
 
-Name UCS\+\_\+text\+\_\+detect\+\_\+bom -\/ detect text buffer for bom tag. UCS\+\_\+file\+\_\+detect\+\_\+bom -\/ detect file for bom tag.
-
-Return Value Always returns one of CONVD\+\_\+\+UCS\+\_\+\+BOM.
-
-Errors
-
-UCS\+\_\+\+NONE\+\_\+\+BOM -\/ Faile to detect header. 
+Parse xml text to get xml head. 
+\begin{DoxyParams}[1]{Parameters}
+\mbox{\texttt{ in}}  & {\em xmltext} & Xml test to be parsed. \\
+\hline
+\mbox{\texttt{ out}}  & {\em xmlhead} & Upon successful completion its members are set. \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+Upon successful completion, it returns bytes length($>$0) of xml head for xmltext.~\newline
+ Otherwise, returns 0 to indicate the xml head not found. 
+\end{DoxyReturn}

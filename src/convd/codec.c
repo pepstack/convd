@@ -178,7 +178,7 @@ CONVDAPI int UCS_file_detect_bom(const char *textfile, CONVD_UCS_BOM *outbom)
         /* try to read first 4 bytes */
         int cb = file_readbytes(hf, header, 4);
 
-        bom = UCS_text_detect_bom(convbufMake(&headbuf, header, cb));
+        bom = UCS_text_detect_bom(convbuf_mk(&headbuf, header, cb));
 
         file_close(&hf);
 
@@ -188,10 +188,10 @@ CONVDAPI int UCS_file_detect_bom(const char *textfile, CONVD_UCS_BOM *outbom)
             *outbom = bom;
         }
 
-        return CONVD_RET_NOERROR;
+        return CONVD_NOERROR;
     }
 
-    return CONVD_RET_EOPEN;
+    return CONVD_ERR_FILE;
 }
 
 
@@ -201,7 +201,7 @@ int XML_text_parse_head(const conv_buf_t *xmltext, conv_xmlhead_t *xmlhead)
     int offset = 0;
 
     int headlen = 0;
-    char headbuf[CVD_ENCODING_LEN_MAX + 16 + 32];
+    char headbuf[128];
 
     memset(xmlhead, 0, sizeof(*xmlhead));
     xmlhead->bom = UCS_text_detect_bom(xmltext);
@@ -321,7 +321,6 @@ int XML_text_parse_head(const conv_buf_t *xmltext, conv_xmlhead_t *xmlhead)
 int XML_file_parse_head(const char *xmlfile, conv_xmlhead_t *xmlhead)
 {
     filehandle_t hf = file_open_read(xmlfile);
-
     if (hf != filehandle_invalid) {
         conv_buf_t input;
         char headbuf[CVD_ENCODING_LEN_MAX + 16 + 32];
@@ -331,8 +330,7 @@ int XML_file_parse_head(const char *xmlfile, conv_xmlhead_t *xmlhead)
 
         file_close(&hf);
 
-        return XML_text_parse_head(convbufMake(&input, headbuf, headlen), xmlhead);
+        return XML_text_parse_head(convbuf_mk(&input, headbuf, headlen), xmlhead);
     }
-
-    return (-1);
+    return CONVD_ERR_FILE;
 }

@@ -96,13 +96,11 @@ Functions</h2></td></tr>
 <tr class="separator:ab695890f49f00492569a7b4240617493"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ae6d668dad60d8ba74497ca73b48cf601"><td class="memItemLeft" align="right" valign="top"><a class="el" href="convd__api_8h.html#a9724b6972728dc2760ee0e5a0e451ff9">CONVD_UCS_BOM</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="codec_8c.html#ae6d668dad60d8ba74497ca73b48cf601">UCS_text_detect_bom</a> (const <a class="el" href="structconv__buf__t.html">conv_buf_t</a> *header)</td></tr>
 <tr class="separator:ae6d668dad60d8ba74497ca73b48cf601"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a9c7be182f8f67ae64ad311e554c55847"><td class="memItemLeft" align="right" valign="top"><a id="a9c7be182f8f67ae64ad311e554c55847"></a>
-CONVDAPI int&#160;</td><td class="memItemRight" valign="bottom"><b>UCS_file_detect_bom</b> (const char *textfile, <a class="el" href="convd__api_8h.html#a9724b6972728dc2760ee0e5a0e451ff9">CONVD_UCS_BOM</a> *outbom)</td></tr>
+<tr class="memitem:a9c7be182f8f67ae64ad311e554c55847"><td class="memItemLeft" align="right" valign="top">CONVDAPI int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="codec_8c.html#a9c7be182f8f67ae64ad311e554c55847">UCS_file_detect_bom</a> (const char *textfile, <a class="el" href="convd__api_8h.html#a9724b6972728dc2760ee0e5a0e451ff9">CONVD_UCS_BOM</a> *outbom)</td></tr>
 <tr class="separator:a9c7be182f8f67ae64ad311e554c55847"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a3750363e98b29bf3d3541899d1161c66"><td class="memItemLeft" align="right" valign="top">int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="codec_8c.html#a3750363e98b29bf3d3541899d1161c66">XML_text_parse_head</a> (const <a class="el" href="structconv__buf__t.html">conv_buf_t</a> *xmltext, <a class="el" href="structconv__xmlhead__t.html">conv_xmlhead_t</a> *xmlhead)</td></tr>
 <tr class="separator:a3750363e98b29bf3d3541899d1161c66"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:aa0e6dc27157fa28812ed1ed4645c6d32"><td class="memItemLeft" align="right" valign="top"><a id="aa0e6dc27157fa28812ed1ed4645c6d32"></a>
-int&#160;</td><td class="memItemRight" valign="bottom"><b>XML_file_parse_head</b> (const char *xmlfile, <a class="el" href="structconv__xmlhead__t.html">conv_xmlhead_t</a> *xmlhead)</td></tr>
+<tr class="memitem:aa0e6dc27157fa28812ed1ed4645c6d32"><td class="memItemLeft" align="right" valign="top">int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="codec_8c.html#aa0e6dc27157fa28812ed1ed4645c6d32">XML_file_parse_head</a> (const char *xmlfile, <a class="el" href="structconv__xmlhead__t.html">conv_xmlhead_t</a> *xmlhead)</td></tr>
 <tr class="separator:aa0e6dc27157fa28812ed1ed4645c6d32"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
@@ -146,6 +144,43 @@ int&#160;</td><td class="memItemRight" valign="bottom"><b>XML_file_parse_head</b
 
 </div>
 </div>
+<a id="a9c7be182f8f67ae64ad311e554c55847"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a9c7be182f8f67ae64ad311e554c55847">&#9670;&nbsp;</a></span>UCS_file_detect_bom()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">CONVDAPI int UCS_file_detect_bom </td>
+          <td>(</td>
+          <td class="paramtype">const char *&#160;</td>
+          <td class="paramname"><em>pathfile</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype"><a class="el" href="convd__api_8h.html#a9724b6972728dc2760ee0e5a0e451ff9">CONVD_UCS_BOM</a> *&#160;</td>
+          <td class="paramname"><em>outbom</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+<p>Detect the BOM (Byte Order Mark) of an UCS (Unicode Character Set) text file. </p><dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramdir">[in]</td><td class="paramname">pathfile</td><td>Full path to a text file to be BOM detected. </td></tr>
+    <tr><td class="paramdir">[out]</td><td class="paramname">outbom</td><td>Upon successful completion it is set by one value of CONVD_UCS_BOM. </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>Returns</dt><dd>Upon successful completion, it returns 0.<br  />
+ Otherwise, returns CONVD_ERR_FILE(-1) and sets errno to indicate the error. </dd></dl>
+
+</div>
+</div>
 <a id="ae6d668dad60d8ba74497ca73b48cf601"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#ae6d668dad60d8ba74497ca73b48cf601">&#9670;&nbsp;</a></span>UCS_text_detect_bom()</h2>
 
@@ -161,10 +196,51 @@ int&#160;</td><td class="memItemRight" valign="bottom"><b>XML_file_parse_head</b
         </tr>
       </table>
 </div><div class="memdoc">
-<p>Name UCS_text_detect_bom - detect text buffer for bom tag. UCS_file_detect_bom - detect file for bom tag.</p>
-<p>Return Value Always returns one of CONVD_UCS_BOM.</p>
-<p>Errors</p>
-<p>UCS_NONE_BOM - Faile to detect header. </p>
+<p>Detect the BOM (Byte Order Mark) of an UCS (Unicode Character Set) text. </p><dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramdir">[in]</td><td class="paramname">textbuf</td><td>buffer for UCS text to be BOM detected. </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>Returns</dt><dd>one value of CONVD_UCS_BOM. </dd></dl>
+
+</div>
+</div>
+<a id="aa0e6dc27157fa28812ed1ed4645c6d32"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#aa0e6dc27157fa28812ed1ed4645c6d32">&#9670;&nbsp;</a></span>XML_file_parse_head()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">int XML_file_parse_head </td>
+          <td>(</td>
+          <td class="paramtype">const char *&#160;</td>
+          <td class="paramname"><em>xmlfile</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype"><a class="el" href="structconv__xmlhead__t.html">conv_xmlhead_t</a> *&#160;</td>
+          <td class="paramname"><em>xmlhead</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+<p>Parse xml file to get xml head. </p><dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramdir">[in]</td><td class="paramname">xmlfile</td><td>Full path to an xml file to be xmlhead parsed. </td></tr>
+    <tr><td class="paramdir">[out]</td><td class="paramname">xmlhead</td><td>Upon successful completion its members are set. </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>Returns</dt><dd>Upon successful completion, it returns bytes length(&gt;0) of xml head in the xmlfile.<br  />
+ Otherwise, returns 0 to indicate the xml head not found, or returns CONVD_ERR_FILE(-1)<br  />
+ and sets errno to indicate the error. </dd></dl>
 
 </div>
 </div>
@@ -193,10 +269,15 @@ int&#160;</td><td class="memItemRight" valign="bottom"><b>XML_file_parse_head</b
         </tr>
       </table>
 </div><div class="memdoc">
-<p>Name UCS_text_detect_bom - detect text buffer for bom tag. UCS_file_detect_bom - detect file for bom tag.</p>
-<p>Return Value Always returns one of CONVD_UCS_BOM.</p>
-<p>Errors</p>
-<p>UCS_NONE_BOM - Faile to detect header. </p>
+<p>Parse xml text to get xml head. </p><dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramdir">[in]</td><td class="paramname">xmltext</td><td>Xml test to be parsed. </td></tr>
+    <tr><td class="paramdir">[out]</td><td class="paramname">xmlhead</td><td>Upon successful completion its members are set. </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>Returns</dt><dd>Upon successful completion, it returns bytes length(&gt;0) of xml head for xmltext.<br  />
+ Otherwise, returns 0 to indicate the xml head not found. </dd></dl>
 
 </div>
 </div>

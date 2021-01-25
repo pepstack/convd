@@ -29,9 +29,7 @@ extern "C" {
 #define CONVD_ERROR_ICONV    ((iconv_t)(-1))
 #define CONVD_ERROR_SIZE     ((size_t)(-1))
 
-#define CONV_FINISHED          0
-#define CONV_EBREAK          (-1)
-#define CONV_EINSUF          (-2)
+#define CONV_FINISHED        0
 
 #define CONV_LINE_MAXSIZE    ((ub4) 65536)
 

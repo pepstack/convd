@@ -2,8 +2,6 @@ var convd__i_8h =
 [
     [ "_conv_descriptor_t", "struct__conv__descriptor__t.html", "struct__conv__descriptor__t" ],
     [ "_conv_position_t", "struct__conv__position__t.html", "struct__conv__position__t" ],
-    [ "CONV_EBREAK", "convd__i_8h.html#a7ab1fbc7993b7f4eb569c75b8d92c074", null ],
-    [ "CONV_EINSUF", "convd__i_8h.html#a48da2b8d59c2833aff511ec7b4b52a4c", null ],
     [ "CONV_FINISHED", "convd__i_8h.html#a8b40459a0ca63908215d96712c152953", null ],
     [ "CONV_LINE_MAXSIZE", "convd__i_8h.html#aae058f1513cda8cfd40c767d7875c7d0", null ],
     [ "CONVD_ERROR_ICONV", "convd__i_8h.html#a693ad7520a4669a966a4761262b64ea7", null ],

@@ -1,11 +1,11 @@
 var convd_8c =
 [
-    [ "convbufMake", "convd_8c.html#a2883a739b9e730488534184ad38ca95b", null ],
+    [ "convbuf_mk", "convd_8c.html#abfdcdac8f6f8eae1b8517eda377587eb", null ],
     [ "convd_cleanup_cb", "convd_8c.html#a54b136bdc2728e5106d00c0ccff09461", null ],
     [ "convd_config", "convd_8c.html#abd94a0b702566fd5068112ec772e29c3", null ],
-    [ "convd_conv_file", "convd_8c.html#ac27acd0c53f89780915688b18db2df4d", null ],
+    [ "convd_conv_file", "convd_8c.html#a0ae1028954db28db90a11def6bd5d29a", null ],
     [ "convd_conv_text", "convd_8c.html#a203ae9b8c302b51304cb178978a681f6", null ],
-    [ "convd_conv_xmlfile", "convd_8c.html#aecb24970edcd121f4deba9ee5ffe91d5", null ],
+    [ "convd_conv_xmlfile", "convd_8c.html#a7876b9cf9093fa069b6e7c9d09ec1d77", null ],
     [ "convd_conv_xmltext", "convd_8c.html#ac0a15a64446cb2e3a0f55f3bdd35ccba", null ],
     [ "convd_create", "convd_8c.html#a9158a3673ac62a422647f650509a5467", null ],
     [ "convd_fromcode", "convd_8c.html#a98eddd2c199fb5ce2f82b73b8c0c59d3", null ],
