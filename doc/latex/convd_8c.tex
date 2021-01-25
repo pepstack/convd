@@ -1,0 +1,127 @@
+\hypertarget{convd_8c}{}\doxysection{src/convd/convd.c File Reference}
+\label{convd_8c}\index{src/convd/convd.c@{src/convd/convd.c}}
+{\ttfamily \#include \char`\"{}convd\+\_\+i.\+h\char`\"{}}\newline
+\doxysubsection*{Functions}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\Hypertarget{convd_8c_a54b136bdc2728e5106d00c0ccff09461}\label{convd_8c_a54b136bdc2728e5106d00c0ccff09461}} 
+static void {\bfseries convd\+\_\+cleanup\+\_\+cb} (\mbox{\hyperlink{struct__conv__descriptor__t}{conv\+\_\+descriptor\+\_\+t}} $\ast$cvd)
+\item 
+\mbox{\Hypertarget{convd_8c_a2883a739b9e730488534184ad38ca95b}\label{convd_8c_a2883a739b9e730488534184ad38ca95b}} 
+\mbox{\hyperlink{structconv__buf__t}{conv\+\_\+buf\+\_\+t}} $\ast$ {\bfseries convbuf\+Make} (\mbox{\hyperlink{structconv__buf__t}{conv\+\_\+buf\+\_\+t}} $\ast$cvbuf, char $\ast$arraybytes, size\+\_\+t numbytes)
+\item 
+\mbox{\Hypertarget{convd_8c_a88ecc4ce404a51e7f714d684386fef56}\label{convd_8c_a88ecc4ce404a51e7f714d684386fef56}} 
+static int {\bfseries ucs\+\_\+file\+\_\+read\+\_\+open} (\mbox{\hyperlink{struct__conv__descriptor__t}{convd\+\_\+t}} cvd, const char $\ast$pathfile, ub4 linesizemax, \mbox{\hyperlink{struct__conv__position__t}{convpos\+\_\+t}} $\ast$\+\_\+cpos)
+\item 
+\mbox{\Hypertarget{convd_8c_a88f98a394fc6472ec23d3a09a5f87075}\label{convd_8c_a88f98a394fc6472ec23d3a09a5f87075}} 
+static int {\bfseries ucs\+\_\+file\+\_\+read\+\_\+next} (\mbox{\hyperlink{struct__conv__position__t}{convpos\+\_\+t}} cpos)
+\item 
+\mbox{\Hypertarget{convd_8c_a19334cb53e0bd3f5ad49f85254b22e8f}\label{convd_8c_a19334cb53e0bd3f5ad49f85254b22e8f}} 
+static void {\bfseries ucs\+\_\+file\+\_\+read\+\_\+close} (\mbox{\hyperlink{struct__conv__position__t}{convpos\+\_\+t}} cpos)
+\item 
+int \mbox{\hyperlink{convd_8c_a9158a3673ac62a422647f650509a5467}{convd\+\_\+create}} (const char $\ast$fromcode, const char $\ast$tocode, \mbox{\hyperlink{convd__api_8h_ac49e30a1de789417659c24956265af67}{CONVD\+\_\+\+SUFFIX\+\_\+\+MODE}} suffix, \mbox{\hyperlink{struct__conv__descriptor__t}{convd\+\_\+t}} $\ast$outcvd)
+\item 
+\mbox{\Hypertarget{convd_8c_a57a5f12188f497b190124a97fb2fbca3}\label{convd_8c_a57a5f12188f497b190124a97fb2fbca3}} 
+void {\bfseries convd\+\_\+release} (\mbox{\hyperlink{struct__conv__descriptor__t}{convd\+\_\+t}} $\ast$pcvd)
+\item 
+\mbox{\Hypertarget{convd_8c_a33ad560ea15077a16bbc500115f514cb}\label{convd_8c_a33ad560ea15077a16bbc500115f514cb}} 
+\mbox{\hyperlink{struct__conv__descriptor__t}{convd\+\_\+t}} {\bfseries convd\+\_\+retain} (\mbox{\hyperlink{struct__conv__descriptor__t}{convd\+\_\+t}} $\ast$cvd)
+\item 
+\mbox{\Hypertarget{convd_8c_a98eddd2c199fb5ce2f82b73b8c0c59d3}\label{convd_8c_a98eddd2c199fb5ce2f82b73b8c0c59d3}} 
+const char $\ast$ {\bfseries convd\+\_\+fromcode} (const \mbox{\hyperlink{struct__conv__descriptor__t}{convd\+\_\+t}} cvd)
+\item 
+\mbox{\Hypertarget{convd_8c_af107d431fb789ac7f8d08941dbba9601}\label{convd_8c_af107d431fb789ac7f8d08941dbba9601}} 
+const char $\ast$ {\bfseries convd\+\_\+tocode} (const \mbox{\hyperlink{struct__conv__descriptor__t}{convd\+\_\+t}} cvd)
+\item 
+int \mbox{\hyperlink{convd_8c_abd94a0b702566fd5068112ec772e29c3}{convd\+\_\+config}} (const \mbox{\hyperlink{struct__conv__descriptor__t}{convd\+\_\+t}} cvd, int request, void $\ast$argument)
+\item 
+size\+\_\+t \mbox{\hyperlink{convd_8c_a203ae9b8c302b51304cb178978a681f6}{convd\+\_\+conv\+\_\+text}} (\mbox{\hyperlink{struct__conv__descriptor__t}{convd\+\_\+t}} cvd, \mbox{\hyperlink{structconv__buf__t}{conv\+\_\+buf\+\_\+t}} $\ast$input, \mbox{\hyperlink{structconv__buf__t}{conv\+\_\+buf\+\_\+t}} $\ast$output)
+\item 
+int \mbox{\hyperlink{convd_8c_ac27acd0c53f89780915688b18db2df4d}{convd\+\_\+conv\+\_\+file}} (\mbox{\hyperlink{struct__conv__descriptor__t}{convd\+\_\+t}} cvd, const char $\ast$textfilein, size\+\_\+t inoffset, const char $\ast$textfileout, const char $\ast$outhead, size\+\_\+t outheadlen, ub4 linesizemax, ub8 $\ast$outfilesize, int addbom)
+\item 
+\mbox{\Hypertarget{convd_8c_ac0a15a64446cb2e3a0f55f3bdd35ccba}\label{convd_8c_ac0a15a64446cb2e3a0f55f3bdd35ccba}} 
+size\+\_\+t {\bfseries convd\+\_\+conv\+\_\+xmltext} (\mbox{\hyperlink{struct__conv__descriptor__t}{convd\+\_\+t}} cvd, \mbox{\hyperlink{structconv__buf__t}{conv\+\_\+buf\+\_\+t}} $\ast$input, \mbox{\hyperlink{structconv__buf__t}{conv\+\_\+buf\+\_\+t}} $\ast$output)
+\item 
+\mbox{\Hypertarget{convd_8c_aecb24970edcd121f4deba9ee5ffe91d5}\label{convd_8c_aecb24970edcd121f4deba9ee5ffe91d5}} 
+int {\bfseries convd\+\_\+conv\+\_\+xmlfile} (\mbox{\hyperlink{struct__conv__descriptor__t}{convd\+\_\+t}} cvd, const char $\ast$xmlfilein, const char $\ast$xmlfileout, ub4 linesizemax, ub8 $\ast$outfilesize, int addbom)
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Detailed Description}
+libconvd implementation.
+
+\begin{DoxyAuthor}{Author}
+\+: 
+\end{DoxyAuthor}
+\begin{DoxyVersion}{Version}
+\+: @create\+: \$create\$ @update\+: 
+\end{DoxyVersion}
+
+
+\doxysubsection{Function Documentation}
+\mbox{\Hypertarget{convd_8c_abd94a0b702566fd5068112ec772e29c3}\label{convd_8c_abd94a0b702566fd5068112ec772e29c3}} 
+\index{convd.c@{convd.c}!convd\_config@{convd\_config}}
+\index{convd\_config@{convd\_config}!convd.c@{convd.c}}
+\doxysubsubsection{\texorpdfstring{convd\_config()}{convd\_config()}}
+{\footnotesize\ttfamily int convd\+\_\+config (\begin{DoxyParamCaption}\item[{const \mbox{\hyperlink{struct__conv__descriptor__t}{convd\+\_\+t}}}]{cvd,  }\item[{int}]{request,  }\item[{void $\ast$}]{argument }\end{DoxyParamCaption})}
+
+Name convd\+\_\+config -\/ control and query code conversion behavior.
+
+Synopsis \#include $<$iconv.\+h$>$ \#include $<$\mbox{\hyperlink{convd__api_8h}{convd\+\_\+api.\+h}}$>$
+
+int \mbox{\hyperlink{convd__api_8h_ac1f60cd5d2aeb3a48c3964ad485d8575}{convd\+\_\+config(const convd\+\_\+t cvd, int request, void $\ast$arg)}};
+
+Description The convd\+\_\+config function is a direct wrapper of iconvctl() (see\+: iconv.\+h) and can be used to control code conversion behavior by setting or getting the current code conversion behavior settings from the current code conversion pointed to by the conversion descriptor that was returned from a successful convd\+\_\+create call.
+
+The following are the supported values for the request argument\+: (See also\+: \href{https://docs.oracle.com/cd/E36784_01/html/E36874/iconvctl-3c.html}{\texttt{ https\+://docs.\+oracle.\+com/cd/\+E36784\+\_\+01/html/\+E36874/iconvctl-\/3c.\+html}})
+
+ICONV\+\_\+\+GET\+\_\+\+CONVERSION\+\_\+\+BEHAVIOR ICONV\+\_\+\+SET\+\_\+\+CONVERSION\+\_\+\+BEHAVIOR ICONV\+\_\+\+GET\+\_\+\+DISCARD\+\_\+\+ILSEQ ICONV\+\_\+\+SET\+\_\+\+DISCARD\+\_\+\+ILSEQ ICONV\+\_\+\+GET\+\_\+\+TRANSLITERATE ICONV\+\_\+\+SET\+\_\+\+TRANSLITERATE ICONV\+\_\+\+TRIVIALP
+
+Return Value Upon successful completion, \mbox{\hyperlink{convd__api_8h_ac1f60cd5d2aeb3a48c3964ad485d8575}{convd\+\_\+config()}} returns 0 and, optionally, with a value pointed to by the arg argument. Otherwise, \mbox{\hyperlink{convd__api_8h_ac1f60cd5d2aeb3a48c3964ad485d8575}{convd\+\_\+config()}} returns -\/1 and sets errno to indicate the error.
+
+Notes convd\+\_\+config is MT-\/safety. \mbox{\Hypertarget{convd_8c_ac27acd0c53f89780915688b18db2df4d}\label{convd_8c_ac27acd0c53f89780915688b18db2df4d}} 
+\index{convd.c@{convd.c}!convd\_conv\_file@{convd\_conv\_file}}
+\index{convd\_conv\_file@{convd\_conv\_file}!convd.c@{convd.c}}
+\doxysubsubsection{\texorpdfstring{convd\_conv\_file()}{convd\_conv\_file()}}
+{\footnotesize\ttfamily int convd\+\_\+conv\+\_\+file (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{struct__conv__descriptor__t}{convd\+\_\+t}}}]{cvd,  }\item[{const char $\ast$}]{textfilein,  }\item[{size\+\_\+t}]{inoffset,  }\item[{const char $\ast$}]{textfileout,  }\item[{const char $\ast$}]{outhead,  }\item[{size\+\_\+t}]{outheadlen,  }\item[{ub4}]{linesizemax,  }\item[{ub8 $\ast$}]{outfilesize,  }\item[{int}]{addbom }\end{DoxyParamCaption})}
+
+\href{https://worthsen.blog.csdn.net/article/details/86585271}{\texttt{ https\+://worthsen.\+blog.\+csdn.\+net/article/details/86585271}} \mbox{\Hypertarget{convd_8c_a203ae9b8c302b51304cb178978a681f6}\label{convd_8c_a203ae9b8c302b51304cb178978a681f6}} 
+\index{convd.c@{convd.c}!convd\_conv\_text@{convd\_conv\_text}}
+\index{convd\_conv\_text@{convd\_conv\_text}!convd.c@{convd.c}}
+\doxysubsubsection{\texorpdfstring{convd\_conv\_text()}{convd\_conv\_text()}}
+{\footnotesize\ttfamily size\+\_\+t convd\+\_\+conv\+\_\+text (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{struct__conv__descriptor__t}{convd\+\_\+t}}}]{cvd,  }\item[{\mbox{\hyperlink{structconv__buf__t}{conv\+\_\+buf\+\_\+t}} $\ast$}]{input,  }\item[{\mbox{\hyperlink{structconv__buf__t}{conv\+\_\+buf\+\_\+t}} $\ast$}]{output }\end{DoxyParamCaption})}
+
+Name convd\+\_\+conv\+\_\+text -\/ character set conversion.
+
+Return Value On success, it returns length of bytes (not less than 0) successfully converted; On error, it returns CONVD\+\_\+\+RET\+\_\+\+ECONV(-\/1) and caller can use strerror(errno) to get more error details.
+
+Errors
+
+CONVD\+\_\+\+RET\+\_\+\+EICONV -\/ Faile to call iconv\+\_\+open. uses strerror(errno) to get more error details.
+
+Notes input and output should be changed after calling. \mbox{\Hypertarget{convd_8c_a9158a3673ac62a422647f650509a5467}\label{convd_8c_a9158a3673ac62a422647f650509a5467}} 
+\index{convd.c@{convd.c}!convd\_create@{convd\_create}}
+\index{convd\_create@{convd\_create}!convd.c@{convd.c}}
+\doxysubsubsection{\texorpdfstring{convd\_create()}{convd\_create()}}
+{\footnotesize\ttfamily int convd\+\_\+create (\begin{DoxyParamCaption}\item[{const char $\ast$}]{fromcode,  }\item[{const char $\ast$}]{tocode,  }\item[{\mbox{\hyperlink{convd__api_8h_ac49e30a1de789417659c24956265af67}{CONVD\+\_\+\+SUFFIX\+\_\+\+MODE}}}]{suffix,  }\item[{\mbox{\hyperlink{struct__conv__descriptor__t}{convd\+\_\+t}} $\ast$}]{outcvd }\end{DoxyParamCaption})}
+
+Create a new convd\+\_\+t object. 
+\begin{DoxyParams}[1]{Parameters}
+\mbox{\texttt{ in}}  & {\em fromcode} & Convert characters from encoding \\
+\hline
+\mbox{\texttt{ in}}  & {\em tocode} & Convert characters to encoding \\
+\hline
+\mbox{\texttt{ in}}  & {\em suffix} & Options controlling conversion problems ~\newline
+ \\
+\hline
+\mbox{\texttt{ out}}  & {\em outcvd} & The conversion descriptor relates the two encoded character sets. \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+On success, it returns CONVD\+\_\+\+NOERROR(=0) and the out parameter of outcvd is set by a convd\+\_\+t object; On error, it returns an error code like CONVD\+\_\+\+ERR\+\_\+?, and out parameter of outcvd is undefined.
+\end{DoxyReturn}
+@retal CONVD\+\_\+\+NOERROR success @retal CONVD\+\_\+\+ERR\+\_\+\+FROMCODE invalid value for fromcode @retal CONVD\+\_\+\+ERR\+\_\+\+TOCODE invalid value for tocode @retal CONVD\+\_\+\+ERR\+\_\+\+SUFFIX invalid value for suffix @retal CONVD\+\_\+\+ERR\+\_\+\+ICONV\+\_\+\+OPEN an error occurred while calling iconv\+\_\+open().
+
+\begin{DoxyNote}{Note}
+convd\+\_\+t object can be safely accessed from multiple threads (MT-\/safe). 
+\end{DoxyNote}

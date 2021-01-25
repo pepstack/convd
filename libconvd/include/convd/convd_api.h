@@ -180,7 +180,7 @@ CONVDAPI int conv_xmlhead_format(const conv_xmlhead_t *xmlhead, conv_buf_t *outp
  * @param[in] fromcode    Convert characters from encoding
  * @param[in] tocode      Convert characters to encoding
  * @param[in] suffix      Options controlling conversion problems    
- * @param[out] outcvd     The conversion descriptor relates the two encoded character sets.
+ * @param[out] outcvd     A convd_t object created
  * @return
  *   On success, it returns CONVD_NOERROR(=0) and the out parameter of outcvd is set by a convd_t object;
  *   On error, it returns an error code like CONVD_ERR_?, and out parameter of outcvd is undefined.

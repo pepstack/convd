@@ -193,13 +193,13 @@ int convd_create(const char *fromcode, const char *tocode, CONVD_SUFFIX_MODE suf
     fromlen = cstr_length(fromcode, CVD_ENCODING_LEN_MAX + 1);
     if (fromlen < 1 || fromlen > CVD_ENCODING_LEN_MAX) {
         /* invalid from code */
-        return CONVD_RET_EENCODING;
+        return CONVD_ERR_FROMCODE;
     }
 
     tolen = cstr_length(tocode, CVD_ENCODING_LEN_MAX + 1);
     if (tolen < 1 || tolen > CVD_ENCODING_LEN_MAX) {
         /* invalid to code */
-        return CONVD_RET_EENCODING;
+        return CONVD_ERR_TOCODE;
     }
 
     cvd = (conv_descriptor_t *)refc_object_new(0, sizeof(conv_descriptor_t) + fromlen + tolen + sizeof(char) * 12, convd_cleanup_cb);
@@ -216,16 +216,15 @@ int convd_create(const char *fromcode, const char *tocode, CONVD_SUFFIX_MODE suf
         cstr_toupper(&cvd->codebuf[cvd->tocodeat], tolen);
 
         cvd->cd = iconv_open(&cvd->codebuf[cvd->tocodeat], cvd->codebuf);
-
         if (cvd->cd == CONVD_ERROR_ICONV) {
             /* Faile to iconv_open. see: errno */
             refc_object_dec((void**)&cvd);
-            return CONVD_RET_EOPEN;
+            return CONVD_ERR_ICONV_OPEN;
         }
 
         /* success */
         *outcvd = cvd;
-        return CONVD_RET_NOERROR;
+        return CONVD_NOERROR;
     }
 
     memcpy(&cvd->codebuf[cvd->tocodeat], tocode, tolen);
@@ -238,20 +237,19 @@ int convd_create(const char *fromcode, const char *tocode, CONVD_SUFFIX_MODE suf
     } else {
         /* Invalid suffix argument: errno = 0 */
         refc_object_dec((void**)&cvd);
-        return CONVD_RET_ESUFFIX;
+        return CONVD_ERR_SUFFIX;
     }
 
     cvd->cd = iconv_open(&cvd->codebuf[cvd->tocodeat], cvd->codebuf);
-
     if (cvd->cd == CONVD_ERROR_ICONV) {
         /* Faile to iconv_open. see: errno */
         refc_object_dec((void**)&cvd);
-        return CONVD_RET_EOPEN;
+        return CONVD_ERR_ICONV_OPEN;
     }
 
     /* success */
     *outcvd = cvd;
-    return CONVD_RET_NOERROR;
+    return CONVD_NOERROR;
 }
 
 

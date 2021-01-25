@@ -1,0 +1,61 @@
+\hypertarget{convd__i_8h}{}\doxysection{src/convd/convd\+\_\+i.h File Reference}
+\label{convd__i_8h}\index{src/convd/convd\_i.h@{src/convd/convd\_i.h}}
+{\ttfamily \#include $<$common/mscrtdbg.\+h$>$}\newline
+{\ttfamily \#include $<$common/unitypes.\+h$>$}\newline
+{\ttfamily \#include $<$common/memapi.\+h$>$}\newline
+{\ttfamily \#include $<$common/emerglog.\+h$>$}\newline
+{\ttfamily \#include $<$common/refcobject.\+h$>$}\newline
+{\ttfamily \#include $<$common/bo.\+h$>$}\newline
+{\ttfamily \#include $<$iconv.\+h$>$}\newline
+{\ttfamily \#include \char`\"{}convd\+\_\+api.\+h\char`\"{}}\newline
+\doxysubsection*{Data Structures}
+\begin{DoxyCompactItemize}
+\item 
+struct \mbox{\hyperlink{struct__conv__descriptor__t}{\+\_\+conv\+\_\+descriptor\+\_\+t}}
+\item 
+struct \mbox{\hyperlink{struct__conv__position__t}{\+\_\+conv\+\_\+position\+\_\+t}}
+\end{DoxyCompactItemize}
+\doxysubsection*{Macros}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\Hypertarget{convd__i_8h_a693ad7520a4669a966a4761262b64ea7}\label{convd__i_8h_a693ad7520a4669a966a4761262b64ea7}} 
+\#define {\bfseries CONVD\+\_\+\+ERROR\+\_\+\+ICONV}~((iconv\+\_\+t)(-\/1))
+\item 
+\mbox{\Hypertarget{convd__i_8h_ae584a636639b0cc1340bf1b523d8542c}\label{convd__i_8h_ae584a636639b0cc1340bf1b523d8542c}} 
+\#define {\bfseries CONVD\+\_\+\+ERROR\+\_\+\+SIZE}~((size\+\_\+t)(-\/1))
+\item 
+\mbox{\Hypertarget{convd__i_8h_a8b40459a0ca63908215d96712c152953}\label{convd__i_8h_a8b40459a0ca63908215d96712c152953}} 
+\#define {\bfseries CONV\+\_\+\+FINISHED}~0
+\item 
+\mbox{\Hypertarget{convd__i_8h_a7ab1fbc7993b7f4eb569c75b8d92c074}\label{convd__i_8h_a7ab1fbc7993b7f4eb569c75b8d92c074}} 
+\#define {\bfseries CONV\+\_\+\+EBREAK}~(-\/1)
+\item 
+\mbox{\Hypertarget{convd__i_8h_a48da2b8d59c2833aff511ec7b4b52a4c}\label{convd__i_8h_a48da2b8d59c2833aff511ec7b4b52a4c}} 
+\#define {\bfseries CONV\+\_\+\+EINSUF}~(-\/2)
+\item 
+\mbox{\Hypertarget{convd__i_8h_aae058f1513cda8cfd40c767d7875c7d0}\label{convd__i_8h_aae058f1513cda8cfd40c767d7875c7d0}} 
+\#define {\bfseries CONV\+\_\+\+LINE\+\_\+\+MAXSIZE}~((ub4) 65536)
+\end{DoxyCompactItemize}
+\doxysubsection*{Typedefs}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\Hypertarget{convd__i_8h_af6a8dd3924edd4ab4368e902bdae6200}\label{convd__i_8h_af6a8dd3924edd4ab4368e902bdae6200}} 
+typedef struct \mbox{\hyperlink{struct__conv__descriptor__t}{\+\_\+conv\+\_\+descriptor\+\_\+t}} {\bfseries conv\+\_\+descriptor\+\_\+t}
+\item 
+\mbox{\Hypertarget{convd__i_8h_a6f21c9f0b34ec58d91c6328e00cc3ed5}\label{convd__i_8h_a6f21c9f0b34ec58d91c6328e00cc3ed5}} 
+typedef struct \mbox{\hyperlink{struct__conv__position__t}{\+\_\+conv\+\_\+position\+\_\+t}} {\bfseries conv\+\_\+position\+\_\+t}
+\item 
+\mbox{\Hypertarget{convd__i_8h_a5086d50e527167b1161f54640f7c09e1}\label{convd__i_8h_a5086d50e527167b1161f54640f7c09e1}} 
+typedef struct \mbox{\hyperlink{struct__conv__position__t}{\+\_\+conv\+\_\+position\+\_\+t}} $\ast$ {\bfseries convpos\+\_\+t}
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Detailed Description}
+libconvd internal header. \href{http://www.voidcn.com/article/p-pxsttpnn-tt.html}{\texttt{ http\+://www.\+voidcn.\+com/article/p-\/pxsttpnn-\/tt.\+html}}
+
+\begin{DoxyAuthor}{Author}
+\+: 
+\end{DoxyAuthor}
+\begin{DoxyVersion}{Version}
+\+: @create\+: \$create\$ @update\+: 
+\end{DoxyVersion}

@@ -1,0 +1,73 @@
+\hypertarget{codec_8c}{}\doxysection{src/convd/codec.c File Reference}
+\label{codec_8c}\index{src/convd/codec.c@{src/convd/codec.c}}
+{\ttfamily \#include \char`\"{}convd\+\_\+i.\+h\char`\"{}}\newline
+\doxysubsection*{Functions}
+\begin{DoxyCompactItemize}
+\item 
+int \mbox{\hyperlink{codec_8c_ab695890f49f00492569a7b4240617493}{conv\+\_\+xmlhead\+\_\+format}} (const \mbox{\hyperlink{structconv__xmlhead__t}{conv\+\_\+xmlhead\+\_\+t}} $\ast$xmlhead, \mbox{\hyperlink{structconv__buf__t}{conv\+\_\+buf\+\_\+t}} $\ast$output)
+\item 
+\mbox{\hyperlink{convd__api_8h_a9724b6972728dc2760ee0e5a0e451ff9}{CONVD\+\_\+\+UCS\+\_\+\+BOM}} \mbox{\hyperlink{codec_8c_ae6d668dad60d8ba74497ca73b48cf601}{UCS\+\_\+text\+\_\+detect\+\_\+bom}} (const \mbox{\hyperlink{structconv__buf__t}{conv\+\_\+buf\+\_\+t}} $\ast$header)
+\item 
+\mbox{\Hypertarget{codec_8c_a9c7be182f8f67ae64ad311e554c55847}\label{codec_8c_a9c7be182f8f67ae64ad311e554c55847}} 
+CONVDAPI int {\bfseries UCS\+\_\+file\+\_\+detect\+\_\+bom} (const char $\ast$textfile, \mbox{\hyperlink{convd__api_8h_a9724b6972728dc2760ee0e5a0e451ff9}{CONVD\+\_\+\+UCS\+\_\+\+BOM}} $\ast$outbom)
+\item 
+int \mbox{\hyperlink{codec_8c_a3750363e98b29bf3d3541899d1161c66}{XML\+\_\+text\+\_\+parse\+\_\+head}} (const \mbox{\hyperlink{structconv__buf__t}{conv\+\_\+buf\+\_\+t}} $\ast$xmltext, \mbox{\hyperlink{structconv__xmlhead__t}{conv\+\_\+xmlhead\+\_\+t}} $\ast$xmlhead)
+\item 
+\mbox{\Hypertarget{codec_8c_aa0e6dc27157fa28812ed1ed4645c6d32}\label{codec_8c_aa0e6dc27157fa28812ed1ed4645c6d32}} 
+int {\bfseries XML\+\_\+file\+\_\+parse\+\_\+head} (const char $\ast$xmlfile, \mbox{\hyperlink{structconv__xmlhead__t}{conv\+\_\+xmlhead\+\_\+t}} $\ast$xmlhead)
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Detailed Description}
+UCS and XML codec utility.
+
+\begin{DoxyAuthor}{Author}
+\+: 
+\end{DoxyAuthor}
+\begin{DoxyVersion}{Version}
+\+: @create\+: \$create\$ @update\+: 
+\end{DoxyVersion}
+
+
+\doxysubsection{Function Documentation}
+\mbox{\Hypertarget{codec_8c_ab695890f49f00492569a7b4240617493}\label{codec_8c_ab695890f49f00492569a7b4240617493}} 
+\index{codec.c@{codec.c}!conv\_xmlhead\_format@{conv\_xmlhead\_format}}
+\index{conv\_xmlhead\_format@{conv\_xmlhead\_format}!codec.c@{codec.c}}
+\doxysubsubsection{\texorpdfstring{conv\_xmlhead\_format()}{conv\_xmlhead\_format()}}
+{\footnotesize\ttfamily int conv\+\_\+xmlhead\+\_\+format (\begin{DoxyParamCaption}\item[{const \mbox{\hyperlink{structconv__xmlhead__t}{conv\+\_\+xmlhead\+\_\+t}} $\ast$}]{xmlhead,  }\item[{\mbox{\hyperlink{structconv__buf__t}{conv\+\_\+buf\+\_\+t}} $\ast$}]{output }\end{DoxyParamCaption})}
+
+format given xml head to output of ansi string. 
+\begin{DoxyParams}[1]{Parameters}
+\mbox{\texttt{ in}}  & {\em xmlhead} & \\
+\hline
+\mbox{\texttt{ in}}  & {\em output} & \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+On success, it returns length of chars in output buf not including ending null char(\textquotesingle{}\textbackslash{}0\textquotesingle{}); On error, it returns\+: 0 -\/ insufficent output buf; -\/1 -\/ unknown bom. 
+\end{DoxyReturn}
+\mbox{\Hypertarget{codec_8c_ae6d668dad60d8ba74497ca73b48cf601}\label{codec_8c_ae6d668dad60d8ba74497ca73b48cf601}} 
+\index{codec.c@{codec.c}!UCS\_text\_detect\_bom@{UCS\_text\_detect\_bom}}
+\index{UCS\_text\_detect\_bom@{UCS\_text\_detect\_bom}!codec.c@{codec.c}}
+\doxysubsubsection{\texorpdfstring{UCS\_text\_detect\_bom()}{UCS\_text\_detect\_bom()}}
+{\footnotesize\ttfamily \mbox{\hyperlink{convd__api_8h_a9724b6972728dc2760ee0e5a0e451ff9}{CONVD\+\_\+\+UCS\+\_\+\+BOM}} UCS\+\_\+text\+\_\+detect\+\_\+bom (\begin{DoxyParamCaption}\item[{const \mbox{\hyperlink{structconv__buf__t}{conv\+\_\+buf\+\_\+t}} $\ast$}]{textbuf }\end{DoxyParamCaption})}
+
+Name UCS\+\_\+text\+\_\+detect\+\_\+bom -\/ detect text buffer for bom tag. UCS\+\_\+file\+\_\+detect\+\_\+bom -\/ detect file for bom tag.
+
+Return Value Always returns one of CONVD\+\_\+\+UCS\+\_\+\+BOM.
+
+Errors
+
+UCS\+\_\+\+NONE\+\_\+\+BOM -\/ Faile to detect header. \mbox{\Hypertarget{codec_8c_a3750363e98b29bf3d3541899d1161c66}\label{codec_8c_a3750363e98b29bf3d3541899d1161c66}} 
+\index{codec.c@{codec.c}!XML\_text\_parse\_head@{XML\_text\_parse\_head}}
+\index{XML\_text\_parse\_head@{XML\_text\_parse\_head}!codec.c@{codec.c}}
+\doxysubsubsection{\texorpdfstring{XML\_text\_parse\_head()}{XML\_text\_parse\_head()}}
+{\footnotesize\ttfamily int XML\+\_\+text\+\_\+parse\+\_\+head (\begin{DoxyParamCaption}\item[{const \mbox{\hyperlink{structconv__buf__t}{conv\+\_\+buf\+\_\+t}} $\ast$}]{xmltext,  }\item[{\mbox{\hyperlink{structconv__xmlhead__t}{conv\+\_\+xmlhead\+\_\+t}} $\ast$}]{xmlhead }\end{DoxyParamCaption})}
+
+Name UCS\+\_\+text\+\_\+detect\+\_\+bom -\/ detect text buffer for bom tag. UCS\+\_\+file\+\_\+detect\+\_\+bom -\/ detect file for bom tag.
+
+Return Value Always returns one of CONVD\+\_\+\+UCS\+\_\+\+BOM.
+
+Errors
+
+UCS\+\_\+\+NONE\+\_\+\+BOM -\/ Faile to detect header. 

@@ -3,6 +3,7 @@
 *.pyc
 *.stackdump
 
+./doc/
 ./libclogger/
 ./libconvd/
 

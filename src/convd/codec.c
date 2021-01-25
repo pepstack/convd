@@ -36,7 +36,7 @@
 
 int conv_xmlhead_format(const conv_xmlhead_t *xmlhead, conv_buf_t *output)
 {
-    char headbuf[CVD_ENCODING_LEN_MAX + 16 + 32];
+    char headbuf[128];
     int headlen = snprintf_chkd_V1(headbuf, sizeof(headbuf), "<?xml version=\"%s\" encoding=\"%s\"?>", xmlhead->version, xmlhead->encoding);
 
     switch (xmlhead->bom) {
@@ -119,6 +119,7 @@ int conv_xmlhead_format(const conv_xmlhead_t *xmlhead, conv_buf_t *output)
         }
         return 0;
     }
+
     /* unknown bom */
     return -1;    
 }
