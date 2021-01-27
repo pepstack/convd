@@ -37,6 +37,7 @@ extern "C" {
 typedef struct _conv_descriptor_t
 {
     iconv_t cd;
+    CONVD_SUFFIX_MODE suffix;
     int tocodeat;
     char codebuf[0];
 } conv_descriptor_t;

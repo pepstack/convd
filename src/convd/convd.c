@@ -205,6 +205,7 @@ int convd_create(const char *fromcode, const char *tocode, CONVD_SUFFIX_MODE suf
     cvd = (conv_descriptor_t *)refc_object_new(0, sizeof(conv_descriptor_t) + fromlen + tolen + sizeof(char) * 12, convd_cleanup_cb);
 
     cvd->cd = CONVD_ERROR_ICONV;
+    cvd->suffix = suffix;
 
     memcpy(cvd->codebuf, fromcode, fromlen);
     cstr_toupper(cvd->codebuf, fromlen);
@@ -241,6 +242,7 @@ int convd_create(const char *fromcode, const char *tocode, CONVD_SUFFIX_MODE suf
     }
 
     cvd->cd = iconv_open(&cvd->codebuf[cvd->tocodeat], cvd->codebuf);
+
     if (cvd->cd == CONVD_ERROR_ICONV) {
         /* Faile to iconv_open. see: errno */
         refc_object_dec((void**)&cvd);
@@ -248,6 +250,7 @@ int convd_create(const char *fromcode, const char *tocode, CONVD_SUFFIX_MODE suf
     }
 
     /* success */
+    cvd->codebuf[cvd->tocodeat + tolen] = '\0';
     *outcvd = cvd;
     return CONVD_NOERROR;
 }
@@ -271,8 +274,11 @@ const char * convd_fromcode(const convd_t cvd)
 }
 
 
-const char * convd_tocode(const convd_t cvd)
+const char * convd_tocode(const convd_t cvd, CONVD_SUFFIX_MODE *suffix)
 {
+    if (suffix) {
+        *suffix = cvd->suffix;
+    }
     return &cvd->codebuf[cvd->tocodeat];
 }
 
@@ -395,14 +401,14 @@ size_t convd_conv_xmltext(convd_t cvd, conv_buf_t *input, conv_buf_t *output)
         return CONVD_ERR_ICONV;
     }
 
-    if (! memcmp(convd_tocode(cvd), "UTF-8", 5) ||
-        ! memcmp(convd_tocode(cvd), "GB2312", 6) ||
-        ! memcmp(convd_tocode(cvd), "BIG5", 4) ||
-        ! memcmp(convd_tocode(cvd), "GBK", 3) ||
-        ! memcmp(convd_tocode(cvd), "GB18030", 7)) {
+    if (! memcmp(convd_tocode(cvd, 0), "UTF-8", 5) ||
+        ! memcmp(convd_tocode(cvd, 0), "GB2312", 6) ||
+        ! memcmp(convd_tocode(cvd, 0), "BIG5", 4) ||
+        ! memcmp(convd_tocode(cvd, 0), "GBK", 3) ||
+        ! memcmp(convd_tocode(cvd, 0), "GB18030", 7)) {
         // ansi == utf8
         xmlhead.bom = 0;
-        cstr_safecopy(xmlhead.encoding, sizeof(xmlhead.encoding), 0, convd_tocode(cvd), cstr_length(convd_tocode(cvd), sizeof(xmlhead.encoding) - 1));
+        cstr_safecopy(xmlhead.encoding, sizeof(xmlhead.encoding), 0, convd_tocode(cvd, 0), cstr_length(convd_tocode(cvd, 0), sizeof(xmlhead.encoding) - 1));
 
         offslen = conv_xmlhead_format(&xmlhead, convbuf_mk(&outbuf, output->bufp, output->blen));
     } else {
@@ -431,19 +437,15 @@ int convd_conv_xmlfile(convd_t cvd, const char *xmlfilein, const char *xmlfileou
     conv_xmlhead_t xmlhead;
     int headofflen = XML_file_parse_head(xmlfilein, &xmlhead);
     if (headofflen > 0) {
-        if (! memcmp(convd_tocode(cvd), "UTF-8", 5) ||
-            ! memcmp(convd_tocode(cvd), "GB2312", 6) ||
-            ! memcmp(convd_tocode(cvd), "BIG5", 4) ||
-            ! memcmp(convd_tocode(cvd), "GBK", 3) ||
-            ! memcmp(convd_tocode(cvd), "GB18030", 7)) {
+        if (! memcmp(convd_tocode(cvd, 0), "UTF-8", 5) ||
+            ! memcmp(convd_tocode(cvd, 0), "GB2312", 6) ||
+            ! memcmp(convd_tocode(cvd, 0), "BIG5", 4) ||
+            ! memcmp(convd_tocode(cvd, 0), "GBK", 3) ||
+            ! memcmp(convd_tocode(cvd, 0), "GB18030", 7)) {
             conv_buf_t output;
 
-            const char *tocode = convd_tocode(cvd);
+            const char *tocode = convd_tocode(cvd, 0);
             int tocodelen = cstr_length(tocode, -1);
-            char *end = strstr(tocode, "//");
-            if (end) {
-                tocodelen = (int)(end - tocode);
-            }
 
             // ansi == utf8
             xmlhead.bom = 0;
