@@ -57,6 +57,12 @@ extern "C"
 
 #define cstr_length(str, maxlen)    ((int)((str)==NULL? 0: ((int)(maxlen)==(-1)? strlen(str) : strnlen(str, (int)(maxlen)))))
 
+#define cstr_copybuf(dstbuf, src)   \
+    snprintf_chkd_V1(dstbuf, sizeof(dstbuf), "%.*s", (int)strnlen(src, sizeof(dstbuf) - 1), (const char *)(src))
+
+#define cstr_copybuf_len(dstbuf, src, srclen)   \
+    snprintf_chkd_V1(dstbuf, sizeof(dstbuf), "%.*s", (int)(((int)(srclen)) < ((int)sizeof(dstbuf))? (srclen) : (sizeof(dstbuf) - 1)), (const char *)(src))
+
 
 NOWARNING_UNUSED(static)
 void cstr_varray_free (char ** varr, int maxnum)
