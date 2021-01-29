@@ -3,8 +3,8 @@
 *.pyc
 *.stackdump
 
-./doc/
-./libclogger/
+doc/
+libclogger/
 libconvd/
 
 ./libclogger.a
