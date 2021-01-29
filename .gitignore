@@ -3,7 +3,6 @@
 *.pyc
 *.stackdump
 
-doc/
 libclogger/
 libconvd/
 
@@ -27,6 +26,9 @@ libconvd/
 .vs/
 build/
 target/
+
+# doxygen generated
+docs/api/
 
 # Linker output
 *.ilk
