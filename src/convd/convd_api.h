@@ -11,13 +11,6 @@
 #ifndef CONVD_PUBLIC_API_H_
 #define CONVD_PUBLIC_API_H_
 
-// install: doxygen graphviz
-// cd project dir
-// doxygen -g -s
-// https://www.doxygen.nl/manual/docblocks.html#docexamples
-// https://blog.csdn.net/wangxvfeng101/article/details/7301115
-// https://blog.csdn.net/weixin_43636423/article/details/103783811
-
 #ifdef __cplusplus
 extern "C" {
 #endif
