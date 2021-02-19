@@ -52,6 +52,8 @@ extern "C" {
 
 typedef struct _conv_descriptor_t    *convd_t;
 
+typedef struct _xml_attrs_t          *xml_attrs;
+
 
 /**
  * max length for charset encoding including end null char.
@@ -413,6 +415,7 @@ CONVDAPI size_t convd_conv_xmltext(convd_t cvd, conv_buf_t *input, conv_buf_t *o
  *   https://man7.org/linux/man-pages/man3/iconv.3.html
  */
 CONVDAPI int convd_conv_xmlfile(convd_t cvd, const char *xmlfilein, const char *xmlfileout, ub4 linesizemax, int addbom, ub8 *outfilesize);
+
 
 #ifdef __cplusplus
 }
