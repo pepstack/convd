@@ -30,7 +30,7 @@
  * @author     Liang Zhang <350137278@qq.com>
  * @version    0.0.10
  * @create     2017-08-28 11:12:10
- * @update     2021-03-14 22:55:37
+ * @update     2021-03-13 22:55:37
  */
 #ifndef _MISC_H_
 #define _MISC_H_
@@ -49,7 +49,6 @@ extern "C"
   typedef HANDLE filehandle_t;
 
 # define filehandle_invalid INVALID_HANDLE_VALUE
-
 # define fseek_pos_set    ((int)FILE_BEGIN)
 # define fseek_pos_cur    ((int)FILE_CURRENT)
 # define fseek_pos_end    ((int)FILE_END)
@@ -136,7 +135,8 @@ const char *format_posix_syserror (int errnum, char *errmsgbuf, size_t bufsize)
  */
 #if defined(__WINDOWS__)
 
-static filehandle_t file_create(const char *pathname, int flags, int mode)
+NOWARNING_UNUSED(static)
+filehandle_t file_create(const char *pathname, int flags, int mode)
 {
     filehandle_t hf = CreateFileA(pathname, (DWORD)(flags), FILE_SHARE_READ,
                                   NULL,
@@ -146,7 +146,8 @@ static filehandle_t file_create(const char *pathname, int flags, int mode)
     return hf;
 }
 
-static filehandle_t file_open_read(const char *pathname)
+NOWARNING_UNUSED(static)
+filehandle_t file_open_read(const char *pathname)
 {
     filehandle_t hf = CreateFileA(pathname,
                                   GENERIC_READ,
@@ -158,12 +159,14 @@ static filehandle_t file_open_read(const char *pathname)
     return hf;
 }
 
-static filehandle_t file_write_new(const char *pathname)
+NOWARNING_UNUSED(static)
+filehandle_t file_write_new(const char *pathname)
 {
     return file_create(pathname, GENERIC_WRITE, FILE_ATTRIBUTE_NORMAL);
 }
 
-static int file_close(filehandle_t *phf)
+NOWARNING_UNUSED(static)
+int file_close(filehandle_t *phf)
 {
     if (phf) {
         filehandle_t hf = *phf;
@@ -179,7 +182,8 @@ static int file_close(filehandle_t *phf)
     return (-1);
 }
 
-static sb8 file_seek(filehandle_t hf, sb8 distance, int fseekpos)
+NOWARNING_UNUSED(static)
+sb8 file_seek(filehandle_t hf, sb8 distance, int fseekpos)
 {
     LARGE_INTEGER li;
     li.QuadPart = distance;
@@ -190,7 +194,8 @@ static sb8 file_seek(filehandle_t hf, sb8 distance, int fseekpos)
     return (sb8)(-1);
 }
 
-static sb8 file_size(filehandle_t hf)
+NOWARNING_UNUSED(static)
+sb8 file_size(filehandle_t hf)
 {
     LARGE_INTEGER li;
     if (GetFileSizeEx(hf, &li)) {
@@ -202,7 +207,8 @@ static sb8 file_size(filehandle_t hf)
     return (sb8)(-1);
 }
 
-static int file_readbytes(filehandle_t hf, char *bytesbuf, ub4 sizebuf)
+NOWARNING_UNUSED(static)
+int file_readbytes(filehandle_t hf, char *bytesbuf, ub4 sizebuf)
 {
     BOOL ret;
     DWORD cbread, cboffset = 0;
@@ -227,7 +233,8 @@ static int file_readbytes(filehandle_t hf, char *bytesbuf, ub4 sizebuf)
     return (int)cboffset;
 }
 
-static int file_writebytes(filehandle_t hf, const char *bytesbuf, ub4 bytestowrite)
+NOWARNING_UNUSED(static)
+int file_writebytes(filehandle_t hf, const char *bytesbuf, ub4 bytestowrite)
 {
     BOOL ret;
     DWORD cbwritten, cboffset = 0;
@@ -247,7 +254,8 @@ static int file_writebytes(filehandle_t hf, const char *bytesbuf, ub4 bytestowri
     return 0;
 }
 
-static int pathfile_exists(const char *pathname)
+NOWARNING_UNUSED(static)
+int pathfile_exists(const char *pathname)
 {
     if (pathname) {
         WIN32_FIND_DATAA FindFileData;
@@ -265,7 +273,8 @@ static int pathfile_exists(const char *pathname)
     return 0;
 }
 
-static int pathfile_remove(const char *pathname)
+NOWARNING_UNUSED(static)
+int pathfile_remove(const char *pathname)
 {
     if (DeleteFileA(pathname)) {
         return 0;
@@ -274,14 +283,14 @@ static int pathfile_remove(const char *pathname)
     return (-1);
 }
 
-static int pathfile_move(const char *pathnameOld, const char *pathnameNew)
+NOWARNING_UNUSED(static)
+int pathfile_move(const char *pathnameOld, const char *pathnameNew)
 {
     return MoveFileA(pathnameOld, pathnameNew);
 }
 
-#else
+#else /* Linux? */
 
-/* Linux? */
 NOWARNING_UNUSED(static)
 filehandle_t file_create(const char *pathname, int flags, int mode)
 {
@@ -299,7 +308,7 @@ filehandle_t file_open_read(const char *pathname)
 NOWARNING_UNUSED(static)
 filehandle_t file_write_new(const char *pathname)
 {
-    return file_create(toxmlfile, O_WRONLY, S_IRUSR|S_IWUSR|S_IRGRP|S_IROTH);
+    return file_create(pathname, O_WRONLY, S_IRUSR|S_IWUSR|S_IRGRP|S_IROTH);
 }
 
 NOWARNING_UNUSED(static)
@@ -320,7 +329,12 @@ int file_close(filehandle_t *phf)
 NOWARNING_UNUSED(static)
 sb8 file_seek(filehandle_t hf, sb8 distance, int fseekpos)
 {
-    return (sb8) lseek64(hf, (off64_t)sb8, fseekpos);
+    #ifdef WIN32
+        /* warning: cygwin */
+        return  (sb8) lseek(hf, distance, fseekpos);
+    #else
+        return (sb8) lseek64(hf, (off64_t)distance, fseekpos);
+    #endif
 }
 
 NOWARNING_UNUSED(static)
