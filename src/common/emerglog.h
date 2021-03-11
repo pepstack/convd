@@ -22,27 +22,38 @@
  * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  **********************************************************************/
-
 /**
  * @filename   emerglog.h
  *  syslog for EMERG event message.
  *
  *  see syslog as below:
- *    $ cat /var/log/messages |grep $ident
+ *    $ cat /var/log/messages | grep $ident
  *
  * @author     Liang Zhang <350137278@qq.com>
  * @version    0.0.10
- * @create     2019-05-02
- * @update     2020-12-09 18:22:50
+ * @create     2017-05-02 12:02:50
+ * @update     2021-03-07 18:22:50
  */
 #ifndef EMERG_LOG_H_INCLUDED
 #define EMERG_LOG_H_INCLUDED
+
+/**
+ * close "Message from syslogd@code ..." to terminals on el6:
+ *
+ *  1) Comment out the line "*.emerg ... *" in file '/etc/rsyslog.conf' like below:
+ *
+ *  # Everybody gets emergency messages
+ *  #!-- *.emerg         *
+ *
+ *  2) Then restart rsyslog service:
+ *      $ /etc/init.d/rsyslog restart
+ */
+
 
 #if defined(__cplusplus)
 extern "C"
 {
 #endif
-
 
 #if defined (__WINDOWS__)
     #ifndef _INC_WINDOWS
@@ -55,23 +66,25 @@ extern "C"
     # include <syslog.h>
 #endif
 
-#include "misc.h"
 
+#ifndef EMERGLOG_MSGLEN
+#   define EMERGLOG_MSGLEN   1023
+#endif
 
 #ifndef EMERGLOG_IDENT
 #   define EMERGLOG_IDENT    "emerglog.h"
 #endif
+
 
 #ifndef EMERGLOG_OPTION
 #   define EMERGLOG_OPTION   (LOG_PID | LOG_NDELAY | LOG_NOWAIT | LOG_PERROR)
 #endif
 
 
-static void emerg_syslog_message (int exitcode, const char *ident, const char *filename, int lineno, const char *format, ...)
+NOWARNING_UNUSED(static)
+void emerg_syslog_message(int exitcode, const char *ident, const char *filename, int lineno, const char *format, ...)
 {
-    char msgbuf[256];
-    char datefmt[40];
-
+    char msgbuf[EMERGLOG_MSGLEN + 1];
     int chlen = 0;
 
     va_list args;
@@ -79,12 +92,12 @@ static void emerg_syslog_message (int exitcode, const char *ident, const char *f
     chlen = vsnprintf(msgbuf, sizeof(msgbuf), format, args);
     va_end(args);
 
-    if (chlen >= (int) sizeof(msgbuf)) {
-        chlen = (int) sizeof(msgbuf) - 1;
-    }
-    if (chlen < 0) {
+    if (chlen > EMERGLOG_MSGLEN) {
+        chlen = EMERGLOG_MSGLEN;
+    } else if (chlen < 0) {
         chlen = 0;
     }
+
     msgbuf[chlen] = '\0';
 
     if (ident) {
@@ -94,9 +107,9 @@ static void emerg_syslog_message (int exitcode, const char *ident, const char *f
     }
 
     if (filename && lineno) {
-        syslog(LOG_USER | LOG_EMERG, "%.23s (%s:%d) %.*s.\n", format_nowtimeofday(datefmt), filename, lineno, chlen, msgbuf);
+        syslog(LOG_USER | LOG_EMERG, "(%s:%d) %.*s\n", filename, lineno, chlen, msgbuf);
     } else {
-        syslog(LOG_USER | LOG_EMERG, "%.23s %.*s.\n", format_nowtimeofday(datefmt), chlen, msgbuf);
+        syslog(LOG_USER | LOG_EMERG, "%.*s\n", chlen, msgbuf);
     }
 
     closelog();
@@ -109,7 +122,7 @@ static void emerg_syslog_message (int exitcode, const char *ident, const char *f
 
 #define emerglog_oom_exit(ptr, ident)   do { \
         if (! (ptr)) { \
-            emerg_syslog_message(EXIT_FAILURE, ident, __FILE__, __LINE__, "out of memory"); \
+            emerg_syslog_message(EXIT_FAILURE, ident, __FILE__, __LINE__, "FATAL: no memory allocated"); \
         } \
     } while(0)
 
@@ -125,6 +138,9 @@ static void emerg_syslog_message (int exitcode, const char *ident, const char *f
     # define emerglog_exit(ident, message, ...) \
         emerg_syslog_message(EXIT_FAILURE, ident, __FILE__, __LINE__, message, __VA_ARGS__)
 
+    # define emerglog_msg(ident, message, ...) \
+        emerg_syslog_message(0, ident, __FILE__, __LINE__, message, __VA_ARGS__)
+
 #else
 
     # define emerglog_err_exit(err, ident, message, args...) do { \
@@ -135,6 +151,9 @@ static void emerg_syslog_message (int exitcode, const char *ident, const char *f
 
     # define emerglog_exit(ident, message, args...) \
         emerg_syslog_message(EXIT_FAILURE, ident, __FILE__, __LINE__, message, ##args)
+
+    # define emerglog_msg(ident, message, args...) \
+        emerg_syslog_message(0, ident, __FILE__, __LINE__, message, ##args)
 
 #endif
 
